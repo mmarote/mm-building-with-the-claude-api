@@ -49,9 +49,10 @@ class PromptEvaluator:
         self.max_concurrent_tasks = max_concurrent_tasks
         self.model = model
         self.client = anthropic.Anthropic()
-        # The dataset and the grades are JSON, which can be long. If a reply is cut off at the
-        # limit it can't be parsed. You only pay for the tokens Claude actually writes.
-        self.max_tokens = 4000
+        # Claude thinks before it answers, and thinking counts toward max_tokens. The dataset and the
+        # grades are JSON: if a reply is cut off at the limit it can't be parsed.
+        # You only pay for the tokens Claude actually uses.
+        self.max_tokens = 16000
 
     # ---- Dataset ---------------------------------------------------------------
 

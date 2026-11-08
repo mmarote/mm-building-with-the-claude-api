@@ -45,8 +45,10 @@ from helpers.prompt_evaluator import PromptEvaluator, DATA_DIR
 
 
 model = CHEAPEST
-# A meal plan can be long; a cut-off answer would get a lower score for the wrong reason.
-max_tokens = 2000
+# Claude thinks before it answers, and thinking counts toward max_tokens. Too low a limit cuts the
+# meal plan off (a lower score for the wrong reason) or leaves no answer at all.
+# You only pay for the tokens Claude actually uses.
+max_tokens = 16000
 
 dataset_file = DATA_DIR / "03-prompt-engineering-techniques" / "meal-plan-dataset.json"
 
@@ -123,7 +125,7 @@ def evaluate(evaluator):
 
 
 def main():
-    evaluator = PromptEvaluator(max_concurrent_tasks=5)
+    evaluator = PromptEvaluator(max_concurrent_tasks=3)
     build_dataset(evaluator)
     evaluate(evaluator)
 
