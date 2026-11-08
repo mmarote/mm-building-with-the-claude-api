@@ -75,14 +75,9 @@ class PromptEvaluator:
         inputs_text = "\n".join(f"- {name}: {text}" for name, text in prompt_inputs_spec.items())
         prompt = f"""Generate {num_cases} test cases for evaluating a prompt that does this task:
 
-<task_description>
-{task_description}
-</task_description>
+<task_description>{task_description}</task_description>
 
-The prompt takes these inputs:
-<prompt_inputs>
-{inputs_text}
-</prompt_inputs>
+The prompt takes these inputs: <prompt_inputs>{inputs_text}</prompt_inputs>
 
 Make the test cases varied and realistic, including some harder ones. For each test case, give a value
 for every input and the criteria a good answer must meet."""
