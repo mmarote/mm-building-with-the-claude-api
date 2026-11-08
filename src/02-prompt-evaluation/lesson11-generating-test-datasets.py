@@ -32,7 +32,7 @@ from typing import Literal
 import anthropic
 from pydantic import BaseModel
 from helpers.models import CHEAPEST
-from helpers.log_helper import log_turn, log_model_request, log_model_response
+from helpers.log_helper import log_banner, log_model_request, log_model_response
 
 
 class TestCase(BaseModel):
@@ -64,7 +64,7 @@ the task needs: "python", "json" or "regex"."""
 
     messages = [{"role": "user", "content": prompt}]
 
-    log_turn(1, note="generate test cases")
+    log_banner("GENERATE TEST CASES")
     log_model_request(model=model, max_tokens=max_tokens, messages=messages)
 
     response = client.messages.parse(

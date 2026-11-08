@@ -25,7 +25,7 @@ import anthropic
 from pydantic import BaseModel, Field, create_model
 from helpers import log_helper
 from helpers.models import CHEAPEST
-from helpers.log_helper import log_turn, log_model_request, log_model_response
+from helpers.log_helper import log_banner, log_model_request, log_model_response
 
 
 # The data folder at the project root, whatever folder the script is started from.
@@ -89,7 +89,7 @@ for every input and the criteria a good answer must meet."""
 
         messages = [{"role": "user", "content": prompt}]
 
-        log_turn(1, note="generate the dataset")
+        log_banner("GENERATE THE DATASET")
         log_model_request(model=self.model, max_tokens=self.max_tokens, messages=messages)
 
         response = self.client.messages.parse(
@@ -173,7 +173,7 @@ Provide your evaluation with:
 
         # The test cases run in parallel, so their request logs would mix together. The logs are
         # switched off for this part; the report at the end shows each case.
-        log_turn(2, note=f"run and grade {len(dataset)} test cases, {self.max_concurrent_tasks} at a time (logs off)")
+        log_banner(f"RUN AND GRADE {len(dataset)} TEST CASES, {self.max_concurrent_tasks} AT A TIME (logs off)")
         logs_were_on = log_helper.ENABLED
         log_helper.ENABLED = False
         try:
