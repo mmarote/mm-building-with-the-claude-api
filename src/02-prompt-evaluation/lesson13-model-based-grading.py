@@ -156,7 +156,7 @@ def main():
 
     results = run_eval(dataset)
 
-    print(f"\n=== ANSWER TO USER ===\n{json.dumps(results, indent=2)}")
+    print(f"\n=== EVAL REPORT ===\n{json.dumps(results, indent=2)}")
 
 
 if __name__ == "__main__":

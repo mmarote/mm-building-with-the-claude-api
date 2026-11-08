@@ -86,7 +86,7 @@ the task needs: "python", "json" or "regex"."""
 def main():
     dataset = generate_dataset()
     tasks = [case.model_dump() for case in dataset.tasks]
-    print(f"\n=== ANSWER TO USER ===\n{json.dumps(tasks, indent=2)}")
+    print(f"\n=== DATASET ===\n{json.dumps(tasks, indent=2)}")
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     with open(dataset_file, "w", encoding="utf-8") as f:

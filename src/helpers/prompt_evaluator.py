@@ -12,7 +12,8 @@ comes from the prompt alone.
 
 Differences from the course's PromptEvaluator:
 - Structured outputs instead of assistant prefill, for both the dataset and the grades (see lesson 11).
-- The report is printed (the runner UI shows it as the answer), not written to an HTML file.
+- The report is printed under "=== EVAL REPORT ===", not written to an HTML file. It is for the developer:
+  nothing is returned to a user.
 
 The log_* calls come from helpers/log_helper.py and only print what is happening.
 """
@@ -206,4 +207,4 @@ Provide your evaluation with:
         lines.append(f"Pass rate:     {passed} of {len(results)} ({passed / len(results):.0%}, score {PASS_SCORE} or more)")
 
         report = "\n".join(lines)
-        print(f"\n=== ANSWER TO USER ===\n{report}")
+        print(f"\n=== EVAL REPORT ===\n{report}")
