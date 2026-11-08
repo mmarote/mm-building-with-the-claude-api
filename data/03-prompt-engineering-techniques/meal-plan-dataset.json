@@ -1,0 +1,47 @@
+[
+  {
+    "task_description": "Write a compact, concise 1 day meal plan for a single athlete",
+    "scenario": "Standard muscle-gain athlete with no dietary restrictions, requesting a compact one-day meal plan",
+    "prompt_inputs": {
+      "height": "180",
+      "weight": "82",
+      "goal": "Build lean muscle mass while maintaining energy for daily strength training",
+      "restrictions": "None"
+    },
+    "solution_criteria": [
+      "Provides a single-day meal plan with breakfast, lunch, dinner, and snacks that is compact and concise",
+      "Sets a total calorie and protein target appropriate for a 82 kg athlete aiming to build muscle, and the meals roughly meet it",
+      "Includes no foods that conflict with the stated absence of dietary restrictions, while keeping the plan brief"
+    ]
+  },
+  {
+    "task_description": "Write a compact, concise 1 day meal plan for a single athlete",
+    "scenario": "Vegan endurance runner with a smaller frame needing carbohydrate-focused fueling and a short plan",
+    "prompt_inputs": {
+      "height": "165",
+      "weight": "58",
+      "goal": "Improve marathon endurance and recovery between long training runs",
+      "restrictions": "Vegan, no added sugar"
+    },
+    "solution_criteria": [
+      "All foods in the meal plan are vegan, with no meat, dairy, eggs, honey, or other animal products",
+      "Emphasizes complex carbohydrates and fueling appropriate for endurance training while avoiding added sugar",
+      "Keeps the plan compact and concise, and calorie or carbohydrate totals fit a 58 kg endurance athlete"
+    ]
+  },
+  {
+    "task_description": "Write a compact, concise 1 day meal plan for a single athlete",
+    "scenario": "Tall, heavier athlete with multiple restrictions aiming for fat loss while preserving muscle, testing constraint handling",
+    "prompt_inputs": {
+      "height": "195",
+      "weight": "105",
+      "goal": "Lose body fat while preserving muscle mass for a rugby season",
+      "restrictions": "Gluten-free, lactose intolerant, tree nut allergy"
+    },
+    "solution_criteria": [
+      "Excludes all gluten, lactose or dairy, and tree nuts such as almonds, walnuts, cashews, and pecans from every meal and snack",
+      "Provides a high-protein, moderate-calorie plan suited to fat loss while preserving muscle for a large athlete",
+      "Remains a single compact one-day plan without unnecessary extra commentary or multiple-day variations"
+    ]
+  }
+]

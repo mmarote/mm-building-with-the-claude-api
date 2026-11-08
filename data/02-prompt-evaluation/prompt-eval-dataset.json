@@ -1,0 +1,14 @@
+[
+  {
+    "task": "Write a Python function that takes a boto3 S3 client and a bucket name, and returns the number of objects in the bucket by paginating through list_objects_v2 results.",
+    "format": "python"
+  },
+  {
+    "task": "Produce a JSON IAM policy document that allows the s3:GetObject and s3:PutObject actions on all objects inside the arn:aws:s3:::example-logs bucket and denies all other actions on that bucket.",
+    "format": "json"
+  },
+  {
+    "task": "Write a regular expression that matches valid AWS S3 bucket names: 3 to 63 characters, lowercase letters, digits, dots, and hyphens, starting and ending with a letter or digit.",
+    "format": "regex"
+  }
+]
