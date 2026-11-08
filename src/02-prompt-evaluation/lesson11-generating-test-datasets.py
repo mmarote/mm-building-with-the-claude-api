@@ -65,7 +65,12 @@ the task needs: "python", "json" or "regex"."""
     messages = [{"role": "user", "content": prompt}]
 
     log_banner("GENERATE TEST CASES")
-    log_model_request(model=model, max_tokens=max_tokens, messages=messages)
+    # parse() sends output_format as output_config with the JSON schema of TestDataset; the log shows
+    # Pydantic's version of that schema (the SDK adjusts it slightly before sending).
+    log_model_request(
+        model=model, max_tokens=max_tokens, messages=messages,
+        output_config={"format": {"type": "json_schema", "schema": TestDataset.model_json_schema()}},
+    )
 
     response = client.messages.parse(
         model=model,

@@ -100,7 +100,12 @@ def grade_by_model(test_case, output):
     messages = []
     add_user_message(messages, eval_prompt)
 
-    log_model_request(model=model, max_tokens=grader_max_tokens, messages=messages)
+    # parse() sends output_format as output_config with the JSON schema of Grade; the log shows
+    # Pydantic's version of that schema (the SDK adjusts it slightly before sending).
+    log_model_request(
+        model=model, max_tokens=grader_max_tokens, messages=messages,
+        output_config={"format": {"type": "json_schema", "schema": Grade.model_json_schema()}},
+    )
 
     # Structured outputs instead of the course's prefill: Claude's reply must match the Grade model.
     response = client.messages.parse(

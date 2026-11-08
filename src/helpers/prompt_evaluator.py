@@ -90,7 +90,12 @@ for every input and the criteria a good answer must meet."""
         messages = [{"role": "user", "content": prompt}]
 
         log_banner("GENERATE THE DATASET")
-        log_model_request(model=self.model, max_tokens=self.max_tokens, messages=messages)
+        # parse() sends output_format as output_config with the JSON schema of Dataset; the log shows
+        # Pydantic's version of that schema (the SDK adjusts it slightly before sending).
+        log_model_request(
+            model=self.model, max_tokens=self.max_tokens, messages=messages,
+            output_config={"format": {"type": "json_schema", "schema": Dataset.model_json_schema()}},
+        )
 
         response = self.client.messages.parse(
             model=self.model,
@@ -141,7 +146,12 @@ Provide your evaluation with:
 - score: a number between 1 and 10. Any missed criterion lowers the score a lot."""
 
         messages = [{"role": "user", "content": eval_prompt}]
-        log_model_request(model=self.model, max_tokens=self.max_tokens, messages=messages)
+        # parse() sends output_format as output_config with the JSON schema of Grade; the log shows
+        # Pydantic's version of that schema (the SDK adjusts it slightly before sending).
+        log_model_request(
+            model=self.model, max_tokens=self.max_tokens, messages=messages,
+            output_config={"format": {"type": "json_schema", "schema": Grade.model_json_schema()}},
+        )
 
         response = self.client.messages.parse(
             model=self.model,
