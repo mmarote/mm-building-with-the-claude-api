@@ -73,7 +73,7 @@ def main():
     print(f"numbers:      {len(embedding)}")
     print(f"range:        {min(embedding)} to {max(embedding)}")
     print(f"first five:   {embedding[:5]}")
-    print(f"all:          {[embedding]}")
+    print(f"all:          {embedding}")
 
 
 if __name__ == "__main__":
