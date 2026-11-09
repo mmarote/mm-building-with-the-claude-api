@@ -3,3 +3,4 @@
 .DS_Store
 __pycache__
 .claude/settings.local.json
+data/04-tool-use-with-claude/text-editor-workspace/
