@@ -125,10 +125,13 @@ def run_conversation(messages):
         log_turn(turn)
         response = send(messages, model=model, max_tokens=max_tokens, tools=[get_current_datetime_schema])
         add_assistant_message(messages, response)
-        print(text_from_message(response))
 
         if response.stop_reason != "tool_use":
             break
+
+        # Claude's text between tool calls (e.g. "First I'll work out the date"). The course prints it
+        # before the check above; printing it here shows the final answer only once, in main().
+        print(text_from_message(response))
 
         tool_results = run_tools(response)
         add_user_message(messages, tool_results)
@@ -140,8 +143,10 @@ def main():
     messages = []
     add_user_message(messages, user_prompt)
 
-    # run_conversation prints Claude's text after every turn; the last one is the final answer.
     messages = run_conversation(messages)
+
+    # The last message is Claude's final answer.
+    print(f"\n=== ANSWER TO USER ===\n{text_from_message(messages[-1])}")
 
 
 if __name__ == "__main__":
