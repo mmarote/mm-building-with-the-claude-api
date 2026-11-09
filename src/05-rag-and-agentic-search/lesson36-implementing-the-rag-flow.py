@@ -141,20 +141,26 @@ def main() -> None:
     user_embedding = generate_embedding(user_question, input_type="query")
 
     # 5. Find the closest chunks.
-    log_banner("STEP 5: SEARCH")
+    log_banner("STEP 5: SEMANTIC SEARCH (EMBEDDINGS)")
     print(f"Comparing the question's vector with all {len(store.vectors)} stored vectors "
           f"(cosine distance), keeping the {how_many_results} closest.")
     results = store.search(user_embedding, how_many_results)
 
-    print(f"\n=== SEARCH RESULTS ===\nQuestion: {user_question}")
-    for doc, distance in results:
-        print(f"\ndistance {distance:.3f}\n{doc['content'][0:200]}")
+    # The summary: what the search found.
+    log_banner("SUMMARY: SEMANTIC SEARCH RESULTS (EMBEDDINGS)")
+    print(f"Question: {user_question}")
+    print("distance: lower = closer in meaning (0 = same meaning, 1 = unrelated)")
+    for rank, (doc, distance) in enumerate(results, start=1):
+        best = "   <- best match" if rank == 1 else ""
+        print(f"\n#{rank}  distance {distance:.3f}{best}\n{doc['content'][0:200]}")
 
-    # Not in the course: every chunk, ranked, to see how far the others are.
+    # Not in the course: every chunk, ranked, with its cosine similarity (higher = better),
+    # to see how far the others are.
     print("\nAll chunks, closest first:")
-    for doc, distance in store.search(user_embedding, len(chunks)):
-        print(f"  {distance:.3f}  {title_of(doc['content'])}")
-
+    for rank, (doc, distance) in enumerate(store.search(user_embedding, len(chunks)), start=1):
+        best = "   <- best match" if rank == 1 else ""
+        print(f"  #{rank}  distance {distance:.3f}  (similarity {1 - distance:.2f})  "
+              f"{title_of(doc['content'])}{best}")
 
 if __name__ == "__main__":
     main()
