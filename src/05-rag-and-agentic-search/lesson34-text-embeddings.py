@@ -28,6 +28,9 @@ Provider: Anthropic does not offer embeddings, so the course uses VoyageAI.
 - No Claude API call: this lesson only calls VoyageAI.
 
 https://academy.claude.com/courses/building-with-the-claude-api/text-embeddings
+
+The log_* calls come from helpers/log_helper.py and only print what is happening;
+they are not part of the lesson.
 """
 
 import os
@@ -35,6 +38,7 @@ import re
 from pathlib import Path
 from dotenv import load_dotenv
 import voyageai
+from helpers.log_helper import log_embedding_request, log_embedding_response
 
 
 load_dotenv()  # reads VOYAGE_API_KEY from .env
@@ -51,7 +55,9 @@ def chunk_by_section(document_text):
 def generate_embedding(text, model="voyage-3-large", input_type="query"):
     """Returns the embedding of one text: a list of floats (from the course)"""
     client = voyageai.Client()  # uses VOYAGE_API_KEY
+    log_embedding_request(model=model, input_type=input_type, texts=[text])
     result = client.embed([text], model=model, input_type=input_type)
+    log_embedding_response(result)
     return result.embeddings[0]
 
 

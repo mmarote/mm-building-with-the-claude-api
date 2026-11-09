@@ -1,7 +1,7 @@
 """
 Small logging helpers for the Building with the Claude API lessons.
 
-Eight functions, one per thing worth seeing:
+Ten functions, one per thing worth seeing:
 
     log_banner(...)           a title between two lines, to separate parts of the log
     log_turn(...)             a banner for each round trip with Claude
@@ -11,6 +11,8 @@ Eight functions, one per thing worth seeing:
     log_tool_request(...)     a tool call we are about to run
     log_tool_response(...)    what the tool returned
     log_answer_to_user(...)   Claude's final answer, the app's real output
+    log_embedding_request(...)   texts we send to an embedding model (VoyageAI, RAG lessons)
+    log_embedding_response(...)  the vectors it sends back, and the tokens billed
 
 Usage:
     from helpers.log_helper import (
@@ -30,6 +32,10 @@ Usage:
     log_tool_response(block.name, result)
 
     log_answer_to_user(response)    # when Claude is done
+
+    log_embedding_request(model="voyage-3-large", input_type="query", texts=texts)
+    result = voyage_client.embed(texts, model="voyage-3-large", input_type="query")
+    log_embedding_response(result)
 
 Turn the debug logs off with `log_helper.ENABLED = False`.
 log_answer_to_user is not a debug log, so it always prints.
@@ -217,6 +223,40 @@ def log_tool_response(name: str, result) -> None:
         return
     print(f"<- TOOL RESULT: {name}")
     print(f"   output: {_show(result, indent=None)}")
+
+
+def log_embedding_request(*, model, input_type, texts) -> None:
+    """Log the texts about to be sent to an embedding model (one vector comes back per text)."""
+    if not ENABLED:
+        return
+    print("\n-> REQUEST to embedding model")
+    print(f"   model:       {model}")
+    print(f"   input_type:  {input_type}")
+    print(f"   texts:       {len(texts)}")
+    for number, text in enumerate(texts, start=1):
+        print(f"   [{number}]")
+        print(_indent(_show(text.strip()), prefix="       "))
+
+
+def log_embedding_response(result, elapsed=None, preview=5) -> None:
+    """Log the vectors that came back: how many, their length, the first numbers, and tokens billed.
+
+    Only the first `preview` numbers of each vector are shown; on their own they mean nothing,
+    and a full vector is about a thousand of them.
+    `elapsed` is the call duration in seconds (see Stopwatch).
+    """
+    if not ENABLED:
+        return
+    embeddings = result.embeddings
+    size = len(embeddings[0]) if embeddings else 0
+    print("\n<- RESPONSE from embedding model")
+    print(f"   vectors:      {len(embeddings)} x {size} numbers")
+    for number, vector in enumerate(embeddings, start=1):
+        print(f"   [{number}] {[round(value, 3) for value in vector[:preview]]} ...")
+    # Embedding models generate nothing, so only input tokens are billed.
+    print(f"   total_tokens: {result.total_tokens}")
+    if elapsed is not None:
+        print(f"   time:         {elapsed:.2f}s")
 
 
 def log_answer_to_user(response) -> None:
