@@ -43,6 +43,12 @@ Scripts are added as I write them. Each one is named `lesson<N>-<lesson>.py` and
 
    That's all you need. [src/helpers/models.py](src/helpers/models.py) calls `load_dotenv()`, and every script imports it, so the key is loaded automatically. If `ANTHROPIC_API_KEY` is already exported in your shell, that value takes priority over `.env`.
 
+   The RAG lessons (section 05) also need a free [VoyageAI](https://www.voyageai.com) key for embeddings. Add it to the same file:
+
+   ```
+   VOYAGE_API_KEY=your-voyage-key
+   ```
+
 ## Running
 
 Activate the virtual environment, then run scripts from the project root. Scripts need `PYTHONPATH=src` so they can import the shared helpers in [src/helpers/](src/helpers/) (`from helpers.models import ...`). Set it once per terminal:
@@ -65,4 +71,4 @@ python run_ui.py
 
 ## Dependencies
 
-Pinned in [requirements.txt](requirements.txt). The main ones are `anthropic` (the SDK) and `python-dotenv`. The optional runner UI has its own [runner-ui/requirements.txt](runner-ui/requirements.txt).
+Pinned in [requirements.txt](requirements.txt). The main ones are `anthropic` (the SDK), `python-dotenv` and `voyageai` (embeddings for the RAG lessons). The optional runner UI has its own [runner-ui/requirements.txt](runner-ui/requirements.txt).
