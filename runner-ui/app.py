@@ -59,6 +59,7 @@ GAP_LESSONS = [
     ("02", "10", "A typical eval workflow", "a-typical-eval-workflow"),
     ("04", "20", "Introducing tool use", "introducing-tool-use"),
     ("04", "21", "Project overview", "project-overview"),
+    ("05", "32", "Introducing retrieval augmented generation", "introducing-retrieval-augmented-generation"),
 ]
 GAP_NOTE = "These lessons are explained on the course page and have no practical example in this project."
 
