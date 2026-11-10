@@ -48,6 +48,7 @@ log_answer_to_user is not a debug log, so it always prints.
 """
 
 import json
+import re
 import time
 
 ENABLED = True
@@ -109,17 +110,33 @@ def _to_jsonable(obj):
     return str(obj)
 
 
-def _hide_base64(value):
-    """A copy of messages where base64 file data (images, PDFs) is replaced by a short note.
+BASE64_PREVIEW = 100  # how much of a base64 string to keep in the log
+_BASE64 = re.compile(r"[A-Za-z0-9+/]+={0,2}")
 
-    Otherwise one image fills the whole log with unreadable characters.
+
+def _short_base64(text: str) -> str:
+    return f"{text[:BASE64_PREVIEW]}... <base64 data, {len(text)} characters>"
+
+
+def _hide_base64(value):
+    """A copy of a value (messages, response blocks) where base64 file data is cut to its start.
+
+    Otherwise one image fills the whole log with unreadable characters. Two forms are found:
+    - a source block {"type": "base64", "data": ...}: the images and PDFs we send;
+    - any long string that is only base64 characters: e.g. an image Claude opens in the code
+      execution sandbox, which comes back whole in the response.
     """
     if isinstance(value, list):
         return [_hide_base64(item) for item in value]
     if isinstance(value, dict):
         if value.get("type") == "base64" and isinstance(value.get("data"), str):
-            return {**value, "data": f"<base64 data, {len(value['data'])} characters>"}
+            return {**value, "data": _short_base64(value["data"])}
         return {key: _hide_base64(item) for key, item in value.items()}
+    if isinstance(value, str) and len(value) > 1000 and _BASE64.fullmatch(value):
+        return _short_base64(value)
+    if hasattr(value, "model_dump"):
+        # A response block (SDK object): look inside it.
+        return _hide_base64(value.model_dump(exclude_none=True))
     return value
 
 
@@ -208,8 +225,9 @@ def log_model_response(response) -> None:
             print(f"      input: {_show(block.input, indent=None, limit=None)}")
             print(f"      id:    {block.id}")
         else:
+            # Other blocks (e.g. code execution results) as they come, with base64 file data cut.
             print(f"   {block.type}:")
-            print(_indent(_show(block, limit=None)))
+            print(_indent(_show(_hide_base64(block), limit=None)))
 
 
 def log_model_usage(response, label=None, elapsed=None) -> None:
