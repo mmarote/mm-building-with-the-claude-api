@@ -71,6 +71,10 @@ GAP_LESSONS = [
     ("05", "35", "The full RAG flow", "the-full-rag-flow"),
     ("06", "43", "Prompt caching", "prompt-caching"),
     ("06", "44", "Rules of prompt caching", "rules-of-prompt-caching"),
+    ("07", "47", "Introducing MCP", "introducing-mcp"),
+    ("07", "48", "MCP clients", "mcp-clients"),
+    ("07", "49", "Project setup", "project-setup"),
+    ("07", "51", "The server inspector", "the-server-inspector"),
 ]
 GAP_NOTE = "These lessons are explained on the course page and have no practical example in this project."
 
