@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 25 - Sending tool results
 
-We run the tool Claude asked for, send the result back in a tool_result block, and Claude uses it to write its final answer.
+We run the tool Claude asked for, send the result back in a tool_result block, and Claude
+uses it to write its final answer.
 
 The full round trip (lesson 24 did steps 1-2, this lesson adds 3-5):
 

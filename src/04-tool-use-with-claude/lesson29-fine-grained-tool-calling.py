@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 29 - Fine grained tool calling
 
-With streaming, a tool's arguments arrive in pieces; fine-grained tool calling sends each piece as soon as Claude writes it, instead of in validated bursts.
+With streaming, a tool's arguments arrive in pieces; fine-grained tool calling sends each
+piece as soon as Claude writes it, instead of in validated bursts.
 
 Without fine-grained tool calling (the default):
 

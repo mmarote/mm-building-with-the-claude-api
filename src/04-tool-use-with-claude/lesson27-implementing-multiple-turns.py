@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 27 - Implementing multiple turns
 
-We complete the conversation loop of lesson 26: run_tools handles every tool request in a reply, and run_tool picks the function by the tool's name.
+We complete the conversation loop of lesson 26: run_tools handles every tool request in a
+reply, and run_tool picks the function by the tool's name.
 
 The loop (from lesson 26, now with a full run_tools):
 
@@ -28,8 +29,9 @@ Each tool_result block:
 To add a tool: write its function and schema, add it to run_tool and to the tools list. The loop
 itself does not change (lesson 28 adds a second tool).
 
-The helpers come from helpers/chat_helper.py (lesson 26 writes them out in full). The course's chat()
-is send() there: it returns the whole message. chat() in chat_helper returns only the text.
+The helpers come from helpers/chat_helper.py (lesson 26 writes them out in full). The
+course's chat() is send() there: it returns the whole message. chat() in chat_helper returns
+only the text.
 
 https://academy.claude.com/courses/building-with-the-claude-api/implementing-multiple-turns
 

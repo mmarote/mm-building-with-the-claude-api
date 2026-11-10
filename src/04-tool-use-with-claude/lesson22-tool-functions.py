@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 22 - Tool functions
 
-A tool function is a plain Python function that our code runs when Claude asks for it; here we write the first one, get_current_datetime.
+A tool function is a plain Python function that our code runs when Claude asks for it; here
+we write the first one, get_current_datetime.
 
 Where it fits in tool use:
 

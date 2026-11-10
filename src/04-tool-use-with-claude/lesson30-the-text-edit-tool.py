@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 30 - The text edit tool
 
-The text editor is a tool built into Claude: we send only a short stub, Claude already knows the full schema, and our code carries out the file operations it asks for.
+The text editor is a tool built into Claude: we send only a short stub, Claude already knows
+the full schema, and our code carries out the file operations it asks for.
 
 What we send (Claude expands the stub into the full tool definition):
 

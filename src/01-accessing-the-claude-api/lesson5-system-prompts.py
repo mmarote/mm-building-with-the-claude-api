@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 5 - System prompts
 
-The same question, asked twice: once with no instructions, and once with a system prompt that turns Claude into a math tutor.
+The same question, asked twice: once with no instructions, and once with a system prompt
+that turns Claude into a math tutor.
 
     Turn 1:  question                           ->  Claude answers it directly
     Turn 2:  question + system prompt (a tutor) ->  Claude guides step by step, without giving the answer

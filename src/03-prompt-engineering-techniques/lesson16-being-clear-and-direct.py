@@ -34,8 +34,8 @@ The code follows the loop, one block per step:
     STEP 2  write a prompt   prompt_template: the only part lessons 16-19 change
     STEP 3  evaluate         run_prompt, build_dataset (once), then evaluate
 
-- src/helpers/prompt_evaluator.py: the eval pipeline (dataset, grader, report), built from lessons 11-14.
-  The same in every lesson.
+- src/helpers/prompt_evaluator.py: the eval pipeline (dataset, grader, report), built from
+  lessons 11-14. The same in every lesson.
 - "Diff vs previous" in the runner UI shows what changes from one lesson to the next.
 
 The test cases:

@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 8b - Structured data (structured outputs)
 
-The same task as lesson 8a, getting Claude's answer as JSON that a program can read, done the current way.
+The same task as lesson 8a, getting Claude's answer as JSON that a program can read, done
+the current way.
 
     8a (deprecated):  prefill "```json" + stop sequence  ->  text  ->  json.loads()
     8b (current):     Pydantic model + messages.parse()  ->  response.parsed_output

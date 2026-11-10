@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 38 - A multi-index RAG pipeline
 
-A Retriever runs the semantic search of lesson 36 and the lexical search of lesson 37 on the same question, and merges their rankings with reciprocal rank fusion (RRF).
+A Retriever runs the semantic search of lesson 36 and the lexical search of lesson 37 on the
+same question, and merges their rankings with reciprocal rank fusion (RRF).
 
 The pipeline:
 

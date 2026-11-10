@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 23 - Tool schemas
 
-A tool schema describes a tool function to Claude: its name, what it does, and its arguments; here we write the schema for get_current_datetime.
+A tool schema describes a tool function to Claude: its name, what it does, and its
+arguments; here we write the schema for get_current_datetime.
 
 Where it fits in tool use:
 
@@ -15,7 +16,8 @@ The parts of a schema:
     input_schema  the arguments, as JSON Schema: type, description, default, and which are required
 
 How to write a good schema:
-- A description of about 3-4 sentences: what the tool does, when Claude should use it, what it returns.
+- A description of about 3-4 sentences: what the tool does, when Claude should use it, what
+  it returns.
 - Describe every argument in detail.
 - Name the variable <function name>_schema, so it is clear which function it belongs to.
 - Shortcut: give Claude the function's code and Anthropic's tool use docs, and ask it to write the

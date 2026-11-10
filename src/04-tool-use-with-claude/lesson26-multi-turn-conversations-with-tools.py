@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 26 - Multi-turn conversations with tools
 
-Claude may need several tools, one after another, to answer one question, so our code runs a conversation loop until Claude stops asking for tools.
+Claude may need several tools, one after another, to answer one question, so our code runs a
+conversation loop until Claude stops asking for tools.
 
 Example: "What day is 103 days from today?"
 
@@ -36,7 +37,8 @@ run_tools and adds run_tool, which picks the function by the tool's name.
 Different from the course:
 - The course writes the loop as pseudo-code; here it runs. "if response isn't asking for a tool"
   becomes a check of stop_reason, and chat() gets the tools (the course's sketch leaves them out).
-- chat() here works like send() in helpers/chat_helper.py; the shared chat() still returns only text.
+- chat() here works like send() in helpers/chat_helper.py; the shared chat() still returns
+  only text.
 
 https://academy.claude.com/courses/building-with-the-claude-api/multi-turn-conversations-with-tools
 

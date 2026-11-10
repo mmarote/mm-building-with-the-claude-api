@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 34 - Text embeddings
 
-An embedding is a long list of numbers that captures what a piece of text means; here we turn the first chunk of the report into one, using VoyageAI.
+An embedding is a long list of numbers that captures what a piece of text means; here we
+turn the first chunk of the report into one, using VoyageAI.
 
 Why embeddings: semantic search compares meaning, not words.
 

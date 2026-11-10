@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 13 - Model based grading
 
-Lesson 12 gave every answer a placeholder score of 10; here a second call to Claude grades each answer.
+Lesson 12 gave every answer a placeholder score of 10; here a second call to Claude grades
+each answer.
 
 For each test case:
 
@@ -19,9 +20,10 @@ The three kinds of graders:
 
 Notes:
 - Dataset: data/02-prompt-evaluation/prompt-eval-dataset.json, written by lesson 11.
-- The course gets the grader's JSON with assistant prefill and a stop sequence. Prefill is deprecated
-  and not supported on current models, so, as in lesson 11, we use structured outputs instead: a
-  Pydantic model (Grade) describes the answer, and messages.parse() checks Claude's reply against it.
+- The course gets the grader's JSON with assistant prefill and a stop sequence. Prefill is
+  deprecated and not supported on current models, so, as in lesson 11, we use structured
+  outputs instead: a Pydantic model (Grade) describes the answer, and messages.parse()
+  checks Claude's reply against it.
 
 https://academy.claude.com/courses/building-with-the-claude-api/model-based-grading
 

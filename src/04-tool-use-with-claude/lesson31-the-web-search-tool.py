@@ -1,10 +1,13 @@
 """Building with the Claude API: Lesson 31 - The web search tool
 
-Web search is a tool that Anthropic runs: we only add its definition to the tools list, Claude decides when to search, and the searches, results and citations all come back in one reply.
+Web search is a tool that Anthropic runs: we only add its definition to the tools list,
+Claude decides when to search, and the searches, results and citations all come back in one
+reply.
 
 What we send:
 
-    {"type": "web_search_20250305", "name": "web_search", "max_uses": 5, "allowed_domains": ["nih.gov"]}
+    {"type": "web_search_20250305", "name": "web_search", "max_uses": 5, "allowed_domains":
+    ["nih.gov"]}
 
 - max_uses:        the most searches Claude may run for one request (it may search again to refine).
 - allowed_domains: only search these sites, e.g. nih.gov for evidence-based health information.

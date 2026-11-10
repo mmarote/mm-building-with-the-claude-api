@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 24 - Handling message blocks
 
-We send a question together with the tool schema, and Claude answers with a message made of several blocks, one of them a request to run our tool.
+We send a question together with the tool schema, and Claude answers with a message made of
+several blocks, one of them a request to run our tool.
 
 What happens in this lesson:
 

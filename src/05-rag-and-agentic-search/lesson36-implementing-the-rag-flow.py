@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 36 - Implementing the RAG flow
 
-We put lessons 33 and 34 together: chunk the report, embed every chunk, store them in a small vector index, and find the chunks closest to a user's question.
+We put lessons 33 and 34 together: chunk the report, embed every chunk, store them in a
+small vector index, and find the chunks closest to a user's question.
 
 The five steps:
 

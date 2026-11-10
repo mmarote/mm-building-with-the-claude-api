@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 14 - Code based grading
 
-Lesson 13 graded each answer with a model grader only; this lesson adds a code grader that checks the syntax.
+Lesson 13 graded each answer with a model grader only; this lesson adds a code grader that
+checks the syntax.
 
 For each test case:
 

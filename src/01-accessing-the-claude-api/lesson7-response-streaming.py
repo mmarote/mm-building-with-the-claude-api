@@ -1,12 +1,14 @@
 """Building with the Claude API: Lesson 7 - Response streaming
 
-With streaming, Claude sends the answer in small pieces while it writes, so the user sees text appear right away.
+With streaming, Claude sends the answer in small pieces while it writes, so the user sees
+text appear right away.
 
     normal:     [ wait ............................ ]  whole answer
     streaming:  piece, piece, piece, piece, ...        (text appears as it is written)
 
 - Part 1: the raw events that come back.
-- Part 2: the SDK helper that gives only the text as it arrives, then the complete message at the end.
+- Part 2: the SDK helper that gives only the text as it arrives, then the complete message
+  at the end.
 
 https://academy.claude.com/courses/building-with-the-claude-api/response-streaming
 

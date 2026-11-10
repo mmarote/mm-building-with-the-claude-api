@@ -1,6 +1,8 @@
 """Building with the Claude API: Lesson 37 - BM25 lexical search
 
-Semantic search can miss exact terms such as an incident ID, so here we add BM25, a lexical search that ranks chunks by the words they share with the question, rare words counting most.
+Semantic search can miss exact terms such as an incident ID, so here we add BM25, a lexical
+search that ranks chunks by the words they share with the question, rare words counting
+most.
 
 The problem (from the course):
 

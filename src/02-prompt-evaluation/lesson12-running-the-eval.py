@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 12 - Running the eval
 
-The evaluation pipeline: every test case from the dataset goes through the prompt, and each answer is collected with its test case.
+The evaluation pipeline: every test case from the dataset goes through the prompt, and each
+answer is collected with its test case.
 
 For each test case:
 
@@ -10,7 +11,8 @@ For each test case:
 - Grading: only a placeholder here. The real graders come in lessons 13 and 14.
 
 Known limitations:
-- The prompt has no formatting instructions, so Claude's answers are verbose. Later lessons refine it.
+- The prompt has no formatting instructions, so Claude's answers are verbose. Later lessons
+  refine it.
 - Running the whole dataset takes a while, even with Haiku.
 
 https://academy.claude.com/courses/building-with-the-claude-api/running-the-eval

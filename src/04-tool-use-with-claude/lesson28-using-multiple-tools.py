@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 28 - Using multiple tools
 
-We add the reminder project's other two tools, so Claude can chain several tools to finish one request; the loop itself does not change.
+We add the reminder project's other two tools, so Claude can chain several tools to finish
+one request; the loop itself does not change.
 
 The three tools (lesson 21's project, complete):
 
@@ -25,8 +26,9 @@ The course provides add_duration_to_datetime and set_reminder but does not show 
 versions here are written to match its example output. set_reminder only prints the reminder: a
 real app would store it.
 
-The helpers come from helpers/chat_helper.py (lesson 26 writes them out in full). The course's chat()
-is send() there: it returns the whole message. chat() in chat_helper returns only the text.
+The helpers come from helpers/chat_helper.py (lesson 26 writes them out in full). The
+course's chat() is send() there: it returns the whole message. chat() in chat_helper returns
+only the text.
 
 https://academy.claude.com/courses/building-with-the-claude-api/implementing-multiple-turns
 

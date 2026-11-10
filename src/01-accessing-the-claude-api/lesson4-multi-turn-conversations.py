@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 4 - Multi-turn conversations
 
-Claude does not remember earlier requests, so our code keeps the conversation and sends all of it every time.
+Claude does not remember earlier requests, so our code keeps the conversation and sends all
+of it every time.
 
 The messages list grows with each turn, and the whole list goes with every request:
 

@@ -16,8 +16,8 @@ Then the text is parsed with json.loads().
 DEPRECATED: assistant prefill is not supported on current models.
 - Step 2 returns a 400 error on models such as Claude Haiku 5.5.
 - The code is kept for reference, as in the temperature lesson.
-- To test it anyway, point the model at Claude Haiku 4.5 (`claude-haiku-4-5`), which accepts prefill.
-  Do not use this in new work.
+- To test it anyway, point the model at Claude Haiku 4.5 (`claude-haiku-4-5`), which accepts
+  prefill. Do not use this in new work.
 - Lesson 8b shows the current way: structured outputs.
 
 https://academy.claude.com/courses/building-with-the-claude-api/structured-data

@@ -11,8 +11,9 @@ What changes from lesson 16 (a "Guidelines" list added after the inputs in promp
 Two kinds of specific guidance:
 - Output quality guidelines: length, structure, required elements, tone. Useful in almost every
   prompt. This lesson adds these.
-- Process steps: how to work through the problem (e.g. "1. Brainstorm ... 2. Pick ... 3. Outline ...").
-  Useful for complex troubleshooting, decisions and analysis. Not needed for this prompt.
+- Process steps: how to work through the problem (e.g. "1. Brainstorm ... 2. Pick ... 3.
+  Outline ..."). Useful for complex troubleshooting, decisions and analysis. Not needed for
+  this prompt.
 - The two are often combined: guidelines shape the output, steps shape the reasoning.
 
 The prompt engineering loop:
@@ -35,8 +36,8 @@ The code follows the loop, one block per step:
     STEP 2  write a prompt   prompt_template: the only part lessons 16-19 change
     STEP 3  evaluate         run_prompt, build_dataset (once), then evaluate
 
-- src/helpers/prompt_evaluator.py: the eval pipeline (dataset, grader, report), built from lessons 11-14.
-  The same in every lesson.
+- src/helpers/prompt_evaluator.py: the eval pipeline (dataset, grader, report), built from
+  lessons 11-14. The same in every lesson.
 - "Diff vs previous" in the runner UI shows what changes from one lesson to the next.
 
 The test cases:
