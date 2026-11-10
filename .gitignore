@@ -4,3 +4,4 @@
 __pycache__
 .claude/settings.local.json
 data/04-tool-use-with-claude/text-editor-workspace/
+data/06-features-of-claude/code-execution-output/
