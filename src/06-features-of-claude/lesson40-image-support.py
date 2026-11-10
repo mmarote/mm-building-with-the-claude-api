@@ -13,7 +13,9 @@ The user message (one message, two blocks):
 Limits (see the docs for the exact numbers):
 - A maximum number of images per request, and a maximum size per image (after base64).
 - Smaller maximum dimensions when you send many images at once.
-- An image costs tokens by its size (larger image = more tokens).
+- An image costs tokens by its size: about width x height / 750. Our 900x600 image: ~720 tokens.
+  The usage counts the image inside input_tokens, without a separate number; this script finds
+  the image's share with client.messages.count_tokens (free, no answer generated).
 - Instead of base64 you can send a URL: {"type": "url", "url": "https://..."}.
 
 Prompting with images: the same techniques as with text (lessons 15-19).
@@ -32,9 +34,9 @@ they are not part of the lesson.
 
 import base64
 from pathlib import Path
-from helpers.chat_helper import add_user_message, chat
+from helpers.chat_helper import client, add_user_message, send, text_from_message
 from helpers.models import CHEAPEST
-from helpers.log_helper import log_banner
+from helpers.log_helper import log_banner, log_model_usage
 
 
 image_file = Path(__file__).resolve().parents[2] / "data" / "06-features-of-claude" / "marbles.png"
@@ -55,26 +57,38 @@ step_by_step_prompt = """Analyze this image of marbles and determine the exact c
 What is the exact, verified number of marbles in this image?"""
 
 
+def image_block(image_bytes):
+    return {
+        "type": "image",
+        "source": {
+            "type": "base64",
+            "media_type": "image/png",
+            "data": image_bytes,
+        },
+    }
+
+
 def ask_about_image(image_bytes, prompt):
-    """Sends the image and the prompt in one user message; returns Claude's answer"""
+    """Sends the image and the prompt in one user message; returns the whole response"""
     messages = []
     add_user_message(messages, [
-        # Image block
-        {
-            "type": "image",
-            "source": {
-                "type": "base64",
-                "media_type": "image/png",
-                "data": image_bytes,
-            },
-        },
-        # Text block
-        {
-            "type": "text",
-            "text": prompt,
-        },
+        image_block(image_bytes),            # Image block
+        {"type": "text", "text": prompt},    # Text block
     ])
-    return chat(messages, model=model, max_tokens=max_tokens)
+    response = send(messages, model=model, max_tokens=max_tokens)
+    log_model_usage(response)
+    return response
+
+
+def image_tokens(image_bytes, prompt):
+    """How many input tokens the image adds: count with and without it (free, no API answer)"""
+    with_image = client.messages.count_tokens(model=model, messages=[
+        {"role": "user", "content": [image_block(image_bytes), {"type": "text", "text": prompt}]},
+    ])
+    without_image = client.messages.count_tokens(model=model, messages=[
+        {"role": "user", "content": prompt},
+    ])
+    return with_image.input_tokens - without_image.input_tokens
 
 
 def main():
@@ -83,14 +97,25 @@ def main():
         image_bytes = base64.standard_b64encode(f.read()).decode("utf-8")
 
     log_banner("1. A BARE QUESTION")
-    simple_answer = ask_about_image(image_bytes, simple_prompt)
+    simple_response = ask_about_image(image_bytes, simple_prompt)
 
     log_banner("2. A STEP-BY-STEP PROMPT")
-    step_by_step_answer = ask_about_image(image_bytes, step_by_step_prompt)
+    step_by_step_response = ask_about_image(image_bytes, step_by_step_prompt)
+
+    log_banner("3. WHAT THE IMAGE COSTS (count_tokens, free)")
+    tokens_for_image = image_tokens(image_bytes, simple_prompt)
+    print(f"The image adds {tokens_for_image} input tokens (estimate: 900 x 600 / 750 = 720).")
 
     print(f"\n=== ANSWER TO USER ===\nThe image has {actual_count} marbles.")
-    print(f"\n--- bare question ---\n{simple_answer}")
-    print(f"\n--- step-by-step prompt ---\n{step_by_step_answer}")
+    print(f"\n--- bare question ---\n{text_from_message(simple_response)}")
+    print(f"\n--- step-by-step prompt ---\n{text_from_message(step_by_step_response)}")
+
+    print("\n=== TOKENS ===")
+    print(f"  {'prompt':16} {'input':>7} {'of which image':>15} {'output':>7}")
+    for name, response in [("bare question", simple_response), ("step-by-step", step_by_step_response)]:
+        usage = response.usage
+        print(f"  {name:16} {usage.input_tokens:>7} {tokens_for_image:>15} {usage.output_tokens:>7}")
+    print("\n  input includes the image; output includes thinking.")
 
 
 if __name__ == "__main__":
