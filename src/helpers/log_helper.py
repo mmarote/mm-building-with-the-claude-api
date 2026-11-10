@@ -45,7 +45,9 @@ import json
 import time
 
 ENABLED = True
-MAX_CHARS = 1000  # long values are cut so the console stays readable
+# What we send can hold whole documents, so long values there are cut to keep the console
+# readable. Claude's response is never cut: it is what the lessons are about.
+MAX_CHARS = 3000
 
 
 class Stopwatch:
@@ -70,10 +72,11 @@ class Stopwatch:
         return seconds
 
 
-def _show(value, indent=2) -> str:
+def _show(value, indent=2, limit=MAX_CHARS) -> str:
     """Turn almost anything (dicts, SDK objects, strings) into readable text.
 
     indent=None gives compact one-line JSON, used for short values like tool inputs.
+    limit=None shows the whole value (used for Claude's response).
     """
     if isinstance(value, str):
         text = value
@@ -82,8 +85,8 @@ def _show(value, indent=2) -> str:
             text = json.dumps(value, indent=indent, default=_to_jsonable)
         except TypeError:
             text = str(value)
-    if len(text) > MAX_CHARS:
-        text = text[:MAX_CHARS] + f"... [{len(text) - MAX_CHARS} more chars]"
+    if limit is not None and len(text) > limit:
+        text = text[:limit] + f"... [{len(text) - limit} more chars]"
     return text
 
 
@@ -181,22 +184,22 @@ def log_model_response(response) -> None:
     print(f"   stop_reason: {response.stop_reason}")
     for block in response.content:
         if block.type == "text":
-            print(f"   text:        {_show(block.text)}")
+            print(f"   text:        {_show(block.text, limit=None)}")
             # With citations on (documents, web search), a text block can carry a list of them.
             for citation in getattr(block, "citations", None) or []:
                 print("      citation:")
-                print(_indent(_show(citation), "         "))
+                print(_indent(_show(citation, limit=None), "         "))
         elif block.type in ("tool_use", "server_tool_use", "mcp_tool_use"):
             # Claude doesn't run the tool. It returns the tool name and the input as separate fields.
             # (server_tool_use = a built-in tool that Anthropic runs for us, e.g. web search.
             # mcp_tool_use = a tool on an MCP server, which Anthropic calls for us.)
             print(f"   {block.type}:")
             print(f"      name:  {block.name}")
-            print(f"      input: {_show(block.input, indent=None)}")
+            print(f"      input: {_show(block.input, indent=None, limit=None)}")
             print(f"      id:    {block.id}")
         else:
             print(f"   {block.type}:")
-            print(_indent(_show(block)))
+            print(_indent(_show(block, limit=None)))
 
 
 def log_model_usage(response, label=None, elapsed=None) -> None:
