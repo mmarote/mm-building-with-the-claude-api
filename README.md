@@ -15,7 +15,7 @@ Scripts are added as I write them. Each one is named `lesson<N>-<lesson>.py` and
 | 5. RAG and agentic search | `src/05-rag-and-agentic-search/` |
 | 6. Features of Claude | `src/06-features-of-claude/` |
 | 7. Model Context Protocol | `src/07-model-context-protocol/` |
-| 8. Anthropic apps: Claude Code and computer use | `src/08-anthropic-apps-claude-code-and-computer-use/` |
+| 8. Anthropic apps: Claude Code and computer use | none: these lessons use the Claude Code app |
 | 9. Agents and workflows | `src/09-agents-and-workflows/` |
 
 ## Prerequisites

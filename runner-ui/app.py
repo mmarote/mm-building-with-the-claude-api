@@ -75,6 +75,10 @@ GAP_LESSONS = [
     ("07", "48", "MCP clients", "mcp-clients"),
     ("07", "49", "Project setup", "project-setup"),
     ("07", "51", "The server inspector", "the-server-inspector"),
+    ("08", "57", "Anthropic apps", "anthropic-apps"),
+    ("08", "58", "Claude Code setup", "claude-code-setup"),
+    ("08", "59", "Claude Code in action", "claude-code-in-action"),
+    ("08", "60", "Enhancements with MCP servers", "enhancements-with-mcp-servers"),
 ]
 GAP_NOTE = "These lessons are explained on the course page and have no practical example in this project."
 
