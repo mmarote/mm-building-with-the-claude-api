@@ -1,7 +1,7 @@
 """
 Small logging helpers for the Building with the Claude API lessons.
 
-Twelve functions, one per thing worth seeing:
+Fourteen functions, one per thing worth seeing:
 
     log_banner(...)           a title between two lines, to separate parts of the log
     log_turn(...)             a banner for each round trip with Claude
@@ -15,6 +15,8 @@ Twelve functions, one per thing worth seeing:
     log_embedding_response(...)  the vectors it sends back, and the tokens billed
     log_files_request(...)    a Files API call: upload, metadata, download or delete
     log_files_response(...)   what the Files API sends back
+    log_mcp_request(...)      a message an MCP client sends to an MCP server (MCP lessons)
+    log_mcp_response(...)     the server's answer, as it travels
 
 Usage:
     from helpers.log_helper import (
@@ -42,6 +44,10 @@ Usage:
     log_files_request("upload", filename="data.csv", mime_type="text/csv", size_bytes=1234)
     metadata = client.files.upload(...)
     log_files_response("upload", metadata)
+
+    log_mcp_request("tools/list")
+    result = await session.list_tools()
+    log_mcp_response("tools/list", result)
 
 Turn the debug logs off with `log_helper.ENABLED = False`.
 log_answer_to_user is not a debug log, so it always prints.
@@ -315,6 +321,26 @@ def log_files_response(operation: str, result) -> None:
         print(f"   file content: {len(result.read())} bytes")
         return
     print(_indent(_show(result, limit=None), "   "))
+
+
+def log_mcp_request(method: str, params=None) -> None:
+    """Log a message an MCP client sends to a server: its method (e.g. tools/list) and parameters."""
+    if not ENABLED:
+        return
+    print(f"\n-> MCP REQUEST: {method}")
+    if params:
+        print(f"   params: {_show(params, indent=None, limit=None)}")
+
+
+def log_mcp_response(method: str, result) -> None:
+    """Log what the MCP server answered, with the field names it sends (e.g. inputSchema, mimeType)."""
+    if not ENABLED:
+        return
+    print(f"<- MCP RESULT: {method}")
+    if hasattr(result, "model_dump"):
+        # by_alias: the names on the wire (inputSchema), not the SDK's Python names (input_schema).
+        result = result.model_dump(by_alias=True, exclude_none=True, mode="json")
+    print(_indent(_show(_hide_base64(result), limit=None), "   "))
 
 
 def log_embedding_request(*, model, input_type, texts) -> None:
