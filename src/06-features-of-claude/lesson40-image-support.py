@@ -100,6 +100,8 @@ def main():
     with open(image_file, "rb") as f:
         image_bytes = base64.standard_b64encode(f.read()).decode("utf-8")
 
+    print(f"The image we send: {image_file}")
+
     log_banner("1. A BARE QUESTION")
     simple_response = ask_about_image(image_bytes, simple_prompt)
 
