@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 41 - PDF support
 
-Claude can read PDF files: the code is the image code of lesson 40 with two changes, and here we ask for a one-sentence summary of a report.
+Claude can read PDF files: the code is the image code of lesson 40 with two changes,
+and here we ask for a one-sentence summary of a report.
 
 From an image to a PDF (lesson 40 -> this lesson):
 

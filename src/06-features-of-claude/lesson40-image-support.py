@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 40 - Image support
 
-Claude can read images: we send the image as a block next to the question, and we try a plain question and a step-by-step prompt to count marbles.
+Claude can read images: we send the image as a block next to the question, and we try
+a plain question and a step-by-step prompt to count marbles.
 
 The user message (one message, two blocks):
 

@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 42 - Citations
 
-With citations turned on, Claude points to the exact parts of your documents that support each part of its answer, so a reader can check them.
+With citations turned on, Claude points to the exact parts of your documents that support
+each part of its answer, so a reader can check them.
 
 Turning them on: two extra fields on the document block.
 

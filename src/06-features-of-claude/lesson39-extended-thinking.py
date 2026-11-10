@@ -1,6 +1,7 @@
 """Building with the Claude API: Lesson 39 - Extended thinking
 
-With extended thinking, Claude reasons before it answers, and the reply has two kinds of blocks: thinking (the reasoning) and text (the answer).
+With extended thinking, Claude reasons before it answers, and the reply has two kinds
+of blocks: thinking (the reasoning) and text (the answer).
 
 The reply:
 
