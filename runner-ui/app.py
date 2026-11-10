@@ -61,6 +61,8 @@ GAP_LESSONS = [
     ("04", "21", "Project overview", "project-overview"),
     ("05", "32", "Introducing retrieval augmented generation", "introducing-retrieval-augmented-generation"),
     ("05", "35", "The full RAG flow", "the-full-rag-flow"),
+    ("06", "43", "Prompt caching", "prompt-caching"),
+    ("06", "44", "Rules of prompt caching", "rules-of-prompt-caching"),
 ]
 GAP_NOTE = "These lessons are explained on the course page and have no practical example in this project."
 
