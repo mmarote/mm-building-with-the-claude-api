@@ -69,6 +69,10 @@ python run_ui.py
 
 `run_ui.py` works the same on macOS, Linux and Windows, and finds the virtual environment itself. Every Run calls the API and is billed to your account. The code is in [runner-ui/app.py](runner-ui/app.py).
 
+- While a lesson runs, the Run button becomes **Stop**. Stop (or any other click on the page) stops the lesson like Ctrl+C, so its cleanup still runs, and keeps the output printed so far.
+- Images a lesson saves and mentions in its output (e.g. the plot of lesson 46) are shown below the text.
+- Some lessons show a warning at the top before you run them, e.g. lesson 46 takes several minutes.
+
 ## Dependencies
 
 Pinned in [requirements.txt](requirements.txt). The main ones are `anthropic` (the SDK), `python-dotenv` and `voyageai` (embeddings for the RAG lessons). The optional runner UI has its own [runner-ui/requirements.txt](runner-ui/requirements.txt).

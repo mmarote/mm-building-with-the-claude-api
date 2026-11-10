@@ -22,7 +22,7 @@ The course text is a guide, not a spec. Where it differs from what we use here, 
 - Use `src/helpers/log_helper.py` for logging request, response, usage and tool calls.
 - Lesson scripts make paid API calls. Don't run them without asking; test with a mocked HTTP transport instead.
 - When files are renamed or moved, update the links and run commands in `README.md` in the same change.
-- Runner UI (`runner-ui/app.py`): a new section folder needs an entry in `SECTIONS`; a lesson with several examples needs a name in `LESSON_NAMES`; a beta lesson goes in `BETA_LESSONS`; a course lesson with no script goes in `GAP_LESSONS`. Keep the "Runner UI" section of `README.md` in step.
+- Runner UI (`runner-ui/app.py`): a new section folder needs an entry in `SECTIONS`; a lesson with several examples needs a name in `LESSON_NAMES`; a beta lesson goes in `BETA_LESSONS`; a course lesson with no script goes in `GAP_LESSONS`. A lesson that needs a warning before running (e.g. it takes minutes) goes in `WARNINGS`. Keep the "Runner UI" section of `README.md` in step.
 
 ## Commit messages
 

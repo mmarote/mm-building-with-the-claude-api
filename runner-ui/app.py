@@ -10,9 +10,12 @@ import ast
 import base64
 import difflib
 import os
+import queue
 import re
+import signal
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -29,7 +32,12 @@ VENV_PYTHON = next(
 PYTHON = str(VENV_PYTHON) if VENV_PYTHON else sys.executable
 
 # Extra warnings shown next to a lesson (matched on the file name prefix), e.g. {"lesson3": "Calls Opus, which is expensive."}.
-WARNINGS = {}
+# A warning shown at the top of a lesson's page, keyed by the start of the file name.
+WARNINGS = {
+    "lesson46-": "This lesson usually takes several minutes: Claude writes and runs code in a sandbox, "
+                 "and the page shows nothing new while it works. It is billed for API calls and for "
+                 "container time. Stop ends it early; the uploaded file is still deleted.",
+}
 
 COURSE_URL = "https://academy.claude.com/courses/building-with-the-claude-api"
 # The Claude logo (transparent PNG) for the "Open the course" box, embedded as a data URI.
@@ -202,11 +210,35 @@ def split_output(output):
     return segments
 
 
+# Paths to image files in the output, e.g. "saved data/.../plot.png" (absolute or relative to ROOT).
+# The text is split into words and each word's ending is checked. That takes linear time; a regex
+# like [^\s]+\.png backtracks on long words (e.g. a CSV logged as one JSON string), and that took
+# seconds per redraw on lesson 46's output.
+IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".webp")
+WORD_SEPARATORS = re.compile(r"""[\s"'<>()\[\]]+""")
+
+
+def images_in(text, shown):
+    """Image files mentioned in the text that exist on disk, each once per run (tracked in `shown`)."""
+    found = []
+    for word in WORD_SEPARATORS.split(text):
+        word = word.rstrip(".,:;")   # e.g. "saved plot.png."
+        if not word.lower().endswith(IMAGE_EXTENSIONS):
+            continue
+        path = Path(word) if Path(word).is_absolute() else ROOT / word
+        if path not in shown and path.is_file():
+            shown.add(path)
+            found.append(path)
+    return found
+
+
 def show(box, output):
-    """Draw the output in order: log text in grey boxes, Claude's answers in green boxes."""
+    """Draw the output in order: log text in grey boxes, Claude's answers in green boxes,
+    and below a log box any image file it mentions (e.g. a plot a lesson saved)."""
     segments = split_output(output)
     answers = sum(1 for kind, _ in segments if kind == "answer")
     seen = 0
+    shown = set()
     with box.container():
         for kind, text in segments:
             if kind == "answer":
@@ -215,10 +247,43 @@ def show(box, output):
                 st.success(f"**{label}**\n\n{text}", icon="💬")
             else:
                 st.code(text, language="text", wrap_lines=True)
+                for image in images_in(text, shown):
+                    st.image(str(image), caption=image.name)
 
 
-def run(path, box):
-    """Run a script, streaming its output as it arrives. Returns (output, exit code, seconds)."""
+REDRAW_SECONDS = 0.3   # redraw the output at most this often while a script runs
+POLL_SECONDS = 0.1     # how often the loop checks for new output (and lets Streamlit stop it)
+STOP_GRACE_SECONDS = 5 # after Ctrl+C, how long a script gets to clean up before it is killed
+
+
+def stop_process(proc, while_waiting):
+    """Stop a script like Ctrl+C in a terminal, so its `finally` blocks still run; kill it if it hangs.
+
+    `while_waiting` is called every POLL_SECONDS while the script cleans up, to collect what it prints.
+    """
+    if proc.poll() is not None:
+        return
+    # SIGINT = Ctrl+C (Python raises KeyboardInterrupt). Windows has no SIGINT for a child: terminate.
+    if os.name == "nt":
+        proc.terminate()
+    else:
+        proc.send_signal(signal.SIGINT)
+    deadline = time.perf_counter() + STOP_GRACE_SECONDS
+    while proc.poll() is None and time.perf_counter() < deadline:
+        while_waiting()
+        time.sleep(POLL_SECONDS)
+    if proc.poll() is None:
+        proc.kill()
+        proc.wait()
+
+
+def run(path, box, status, result):
+    """Run a script, streaming its output as it arrives, into `result` (output, code, seconds).
+
+    `result` is filled as the run goes, so a run that is stopped still leaves its output there.
+    code stays None when the runner stopped the script (Stop, or any other click: Streamlit
+    reruns the page, which interrupts this function at its next Streamlit call).
+    """
     # UTF-8 on both sides of the pipe: on Windows the default encoding cannot print the emoji and box characters.
     env = {**os.environ, "PYTHONPATH": str(SRC), "PYTHONUNBUFFERED": "1", "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
     start = time.perf_counter()
@@ -227,12 +292,43 @@ def run(path, box):
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1,
         encoding="utf-8", errors="replace",
     )
-    output = ""
-    for line in proc.stdout:
-        output += line
-        show(box, output)
-    proc.wait()
-    return output, proc.returncode, time.perf_counter() - start
+
+    # A thread reads the output, so this loop never blocks on a script that prints nothing for
+    # minutes (e.g. while Claude works): it keeps calling Streamlit, so Stop takes effect at once.
+    lines = queue.Queue()
+    reader = threading.Thread(target=lambda: [lines.put(line) for line in proc.stdout], daemon=True)
+    reader.start()
+
+    def take_new_lines():
+        while True:
+            try:
+                result["output"] += lines.get_nowait()
+            except queue.Empty:
+                return
+
+    try:
+        last_draw, drawn = 0.0, ""
+        while reader.is_alive() or not lines.empty():
+            take_new_lines()
+            now = time.perf_counter()
+            result["seconds"] = now - start
+            if result["output"] != drawn and now - last_draw >= REDRAW_SECONDS:
+                show(box, result["output"])
+                last_draw, drawn = now, result["output"]
+            status.caption(f"Running... {result['seconds']:.0f}s")
+            time.sleep(POLL_SECONDS)
+        proc.wait()
+        result["code"] = proc.returncode
+    finally:
+        if result["code"] is None:
+            # Stopped: let the script clean up, and keep what it prints meanwhile (the waiting page
+            # run shows it as it arrives, see the top of the page).
+            result["output"] += "\n[stopping: Ctrl+C sent, the lesson is cleaning up]\n"
+            stop_process(proc, while_waiting=take_new_lines)
+            reader.join(timeout=1)
+            take_new_lines()
+            result["output"] += "\n[stopped by the runner]\n"
+        result["seconds"] = time.perf_counter() - start
 
 
 groups = discover()
@@ -251,6 +347,24 @@ if "view" not in st.session_state:
     st.session_state.view = "Code"
 if "run_requested" not in st.session_state:
     st.session_state.run_requested = False
+
+# A click during a run (Stop or any other) stops that page run, but Streamlit does not wait for it:
+# with its "fast reruns" it starts this page run at once, while the old one is still stopping the
+# lesson and saving its output. So wait here until the output is saved, then draw the page with it.
+if st.session_state.get("active_run"):
+    live = st.session_state.get("live_result") or {"output": ""}
+    cleanup_box = st.empty()
+    with st.spinner("Stopping the lesson: it is cleaning up..."):
+        deadline = time.perf_counter() + STOP_GRACE_SECONDS + 10
+        drawn = None
+        while st.session_state.get("active_run") and time.perf_counter() < deadline:
+            # The output, cleanup lines included, as the old page run collects it.
+            if live["output"] != drawn:
+                drawn = live["output"]
+                show(cleanup_box, drawn)
+            time.sleep(REDRAW_SECONDS)
+    cleanup_box.empty()   # the page below draws the saved output
+    st.session_state.active_run = None
 
 
 # While a script runs, keep the newest output in view. Streamlit has no setting for this, so a tiny
@@ -292,6 +406,12 @@ def request_run():
     """Run button callback: show the Output view and run on the next rerun."""
     st.session_state.view = "Output"
     st.session_state.run_requested = True
+
+
+def request_stop():
+    """Stop button callback. The click itself stops the run: Streamlit reruns the page, which
+    interrupts run(), and run() then stops the script and keeps its output so far."""
+    st.session_state.view = "Output"
 
 def open_lesson(path):
     st.session_state.selected = str(path)
@@ -472,7 +592,12 @@ siblings = groups[script.parent.name]
 previous_in_section = siblings[siblings.index(script) - 1] if siblings.index(script) > 0 else None
 
 col_run, col_clear, col_view, col_side, col_diff, _ = st.columns([1, 1, 2, 2, 2.6, 1.4])
-col_run.button("Run", type="primary", on_click=request_run)
+# While a script runs (this page run started it), the Run button is a Stop button.
+running = st.session_state.run_requested
+if running:
+    col_run.button("Stop", type="primary", key="stop", on_click=request_stop)
+else:
+    col_run.button("Run", type="primary", key="run", on_click=request_run)
 if col_clear.button("Clear"):
     st.session_state.results.pop(str(script), None)
     st.session_state.view = "Code"
@@ -509,20 +634,31 @@ def render_output(container):
         box = st.empty()
         if st.session_state.run_requested:
             st.session_state.run_requested = False
+            status = st.empty()
             scroller = st.empty()
             with scroller:
                 components.html(AUTOSCROLL_JS, height=0)
+            result = {"output": "", "code": None, "seconds": 0.0}
+            st.session_state.active_run = str(script)
+            st.session_state.live_result = result   # read by a page run waiting for a stop
             try:
-                with st.spinner("Running..."):
-                    output, code, seconds = run(script, box)
+                run(script, box, status, result)
             finally:
+                # Saved first, also when the run was stopped, so Show output keeps working.
+                st.session_state.results[str(script)] = (result["output"], result["code"], result["seconds"])
+                st.session_state.active_run = None   # lets a waiting page run go on (see the top)
+                status.empty()
                 scroller.empty()   # removes the iframe, which stops the scrolling
-            st.session_state.results[str(script)] = (output, code, seconds)
+            # The run ended on its own: redraw the page, so the Stop button turns back into Run.
+            st.rerun()
         result = st.session_state.results.get(str(script))
         if result:
             output, code, seconds = result
             show(box, output)
-            (st.success if code == 0 else st.error)(f"Exit code {code} - {seconds:.1f}s")
+            if code is None:
+                st.error(f"Stopped after {seconds:.1f}s")
+            else:
+                (st.success if code == 0 else st.error)(f"Exit code {code} - {seconds:.1f}s")
         else:
             box.info("Press Run.")
 
