@@ -10,7 +10,8 @@ From an image to a PDF (lesson 40 -> this lesson):
 
 What Claude reads in a PDF: the text, and also images, charts, tables and the layout of each page.
 
-What a PDF costs: each page is sent twice, as its extracted text and as an image of the page.
+Beyond the course: what a PDF costs (step 2 of this script; not in the course lesson).
+Each page is sent twice, as its extracted text and as an image of the page.
 
     PDF page   =  text tokens  +  image tokens      (the image is what shows charts and layout)
     plain text =  text tokens only
@@ -72,7 +73,8 @@ def main():
     response = send(messages, model=model, max_tokens=max_tokens)
     log_model_usage(response)
 
-    log_banner("2. THE SAME REPORT: PDF VS. PLAIN TEXT (count_tokens, free)")
+    # Beyond the course: the token comparison below is our addition.
+    log_banner("2. BEYOND THE COURSE: PDF VS. PLAIN TEXT (count_tokens, free)")
     text_block = {"type": "text", "text": text_file.read_text(encoding="utf-8")}
     question = {"type": "text", "text": user_prompt}
     pdf_tokens = count_input_tokens([pdf_block, question])

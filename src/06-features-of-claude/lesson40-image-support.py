@@ -13,15 +13,18 @@ The user message (one message, two blocks):
 Limits (see the docs for the exact numbers):
 - A maximum number of images per request, and a maximum size per image (after base64).
 - Smaller maximum dimensions when you send many images at once.
-- An image costs tokens by its size: about width x height / 750. Our 900x600 image: ~720 tokens.
-  The usage counts the image inside input_tokens, without a separate number; this script finds
-  the image's share with client.messages.count_tokens (free, no answer generated).
+- An image costs tokens by its size (larger image = more tokens).
 - Instead of base64 you can send a URL: {"type": "url", "url": "https://..."}.
 
 Prompting with images: the same techniques as with text (lessons 15-19).
 - A bare question ("how many?") can give a wrong answer.
 - Give a method, step by step; check the result another way; define the output.
 - Also useful: an example image with a known answer, and a fixed scale for ratings.
+
+Beyond the course: what the image costs (step 3 and the TOKENS table; not in the course lesson).
+- About width x height / 750 tokens. Our 900x600 image: ~720 tokens.
+- The usage counts the image inside input_tokens, without a separate number; this script finds
+  the image's share with client.messages.count_tokens (free, no answer generated).
 
 The image: data/06-features-of-claude/marbles.png, 23 marbles drawn by us (the course does not
 provide its image), so we know the right answer.
@@ -102,7 +105,8 @@ def main():
     log_banner("2. A STEP-BY-STEP PROMPT")
     step_by_step_response = ask_about_image(image_bytes, step_by_step_prompt)
 
-    log_banner("3. WHAT THE IMAGE COSTS (count_tokens, free)")
+    # Beyond the course: the token counting below is our addition.
+    log_banner("3. BEYOND THE COURSE: WHAT THE IMAGE COSTS (count_tokens, free)")
     tokens_for_image = image_tokens(image_bytes, simple_prompt)
     print(f"The image adds {tokens_for_image} input tokens (estimate: 900 x 600 / 750 = 720).")
 
@@ -110,7 +114,7 @@ def main():
     print(f"\n--- bare question ---\n{text_from_message(simple_response)}")
     print(f"\n--- step-by-step prompt ---\n{text_from_message(step_by_step_response)}")
 
-    print("\n=== TOKENS ===")
+    print("\n=== TOKENS (beyond the course) ===")
     print(f"  {'prompt':16} {'input':>7} {'of which image':>15} {'output':>7}")
     for name, response in [("bare question", simple_response), ("step-by-step", step_by_step_response)]:
         usage = response.usage
