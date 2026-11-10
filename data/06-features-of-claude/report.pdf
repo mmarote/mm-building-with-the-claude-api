@@ -1,0 +1,152 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R] /Count 5 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 985 >>
+stream
+BT
+50 790 Td
+/F2 18 Tf 24 TL
+(Annual Report 2023 - Northwind Research Group) Tj T*
+/F1 11 Tf 15 TL T*
+/F1 11 Tf 15 TL
+(Northwind Research Group works across medical research, software, finance and security. This) Tj T*
+(report summarizes the year for each division. All figures are fictional and exist only for) Tj T*
+(the RAG lessons.) Tj T*
+T*
+/F2 14 Tf 20 TL
+(Section 1: Medical Research) Tj T*
+/F1 11 Tf 15 TL T*
+/F1 11 Tf 15 TL
+(The medical research division completed the second phase of its trial for XR-472, an) Tj T*
+(experimental treatment for chronic migraine. Of the 340 patients enrolled, 61% reported at) Tj T*
+(least a 50% drop in monthly migraine days after twelve weeks. Side effects were mild and) Tj T*
+(mostly limited to drowsiness during the first week. The division plans to start the third) Tj T*
+(phase in the spring, pending approval from the review board. A partnership with two) Tj T*
+(university hospitals will double the number of trial sites.) Tj T*
+T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 600 >>
+stream
+BT
+50 790 Td
+/F2 14 Tf 20 TL
+(Section 2: Software Engineering) Tj T*
+/F1 11 Tf 15 TL T*
+/F1 11 Tf 15 TL
+(The software team rebuilt the patient data platform on a new event-driven architecture.) Tj T*
+(Average page load time fell from 2.8 seconds to 0.9 seconds, and the platform handled a peak) Tj T*
+(of 12,000 requests per minute without errors. The team moved all services to automated) Tj T*
+(deployment, which cut the release cycle from two weeks to two days. Test coverage rose to) Tj T*
+(84%. Next year the team will focus on offline support for clinicians working in rural areas.) Tj T*
+T*
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 555 >>
+stream
+BT
+50 790 Td
+/F2 14 Tf 20 TL
+(Section 3: Financial Analysis) Tj T*
+/F1 11 Tf 15 TL T*
+/F1 11 Tf 15 TL
+(Revenue grew 18% to 412 million dollars, driven by licensing income from the software) Tj T*
+(platform. Operating costs rose 9%, mainly because of new hires in research. The gross margin) Tj T*
+(improved from 54% to 58%. The group spent 96 million dollars on research and development,) Tj T*
+(the largest amount in its history. Cash reserves stand at 150 million dollars, enough to) Tj T*
+(fund the third trial phase without new borrowing.) Tj T*
+T*
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 12 0 R >>
+endobj
+12 0 obj
+<< /Length 585 >>
+stream
+BT
+50 790 Td
+/F2 14 Tf 20 TL
+(Section 4: Cybersecurity) Tj T*
+/F1 11 Tf 15 TL T*
+/F1 11 Tf 15 TL
+(In the fourth quarter, the security team detected and contained incident INC-2023-Q4-011, an) Tj T*
+(attempt to access the patient data platform with stolen employee credentials. The attackers) Tj T*
+(reached a test environment but no production data. The team reset all affected accounts) Tj T*
+(within four hours and made hardware security keys mandatory for every employee. An external) Tj T*
+(audit in December found no remaining vulnerabilities related to the incident.) Tj T*
+T*
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 14 0 R >>
+endobj
+14 0 obj
+<< /Length 419 >>
+stream
+BT
+50 790 Td
+/F2 14 Tf 20 TL
+(Section 5: Outlook) Tj T*
+/F1 11 Tf 15 TL T*
+/F1 11 Tf 15 TL
+(For 2024 the group expects revenue growth between 12% and 15%. The main priorities are the) Tj T*
+(third phase of the XR-472 trial, offline support in the patient data platform, and a) Tj T*
+(security training program for all staff. The board approved a budget increase of 10% for) Tj T*
+(research and development.) Tj T*
+T*
+ET
+endstream
+endobj
+15 0 obj
+<< /Title (Annual Report 2023 - Northwind Research Group) /Producer (handwritten generator) >>
+endobj
+xref
+0 16
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000141 00000 n 
+0000000211 00000 n 
+0000000286 00000 n 
+0000000422 00000 n 
+0000001458 00000 n 
+0000001594 00000 n 
+0000002245 00000 n 
+0000002382 00000 n 
+0000002989 00000 n 
+0000003127 00000 n 
+0000003764 00000 n 
+0000003902 00000 n 
+0000004373 00000 n 
+trailer
+<< /Size 16 /Root 1 0 R /Info 15 0 R >>
+startxref
+4484
+%%EOF
