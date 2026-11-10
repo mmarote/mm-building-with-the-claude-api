@@ -219,18 +219,25 @@ def log_model_usage(response, label=None, elapsed=None) -> None:
         if elapsed is not None:
             print(f"   time:          {elapsed:.2f}s")
         return
+    # Prompt caching: input is split in three. The counters are None when the API leaves them out.
+    cache_written = getattr(usage, "cache_creation_input_tokens", None)
+    cache_read = getattr(usage, "cache_read_input_tokens", None)
+    total = usage.input_tokens + (cache_written or 0) + (cache_read or 0) + usage.output_tokens
+
     print(f"\n$ USAGE {title}")
-    print(f"   input_tokens:  {usage.input_tokens}")
-    print(f"   output_tokens: {usage.output_tokens}")
-    print(f"   total_tokens:  {usage.input_tokens + usage.output_tokens}")
+    print(f"   input_tokens:                {usage.input_tokens}   (not cached)")
+    if cache_written is not None or cache_read is not None:
+        print(f"   cache_creation_input_tokens: {cache_written or 0}   (written to the cache)")
+        print(f"   cache_read_input_tokens:     {cache_read or 0}   (read from the cache)")
+    print(f"   output_tokens:               {usage.output_tokens}")
+    print(f"   total_tokens:                {total}")
     if elapsed is not None:
         speed = f" ({usage.output_tokens / elapsed:.0f} output tokens/s)" if elapsed > 0 else ""
-        print(f"   time:          {elapsed:.2f}s{speed}")
-    # Prompt-caching counters: only shown when the API reports them and they are not zero.
-    for name in ("cache_read_input_tokens", "cache_creation_input_tokens"):
-        count = getattr(usage, name, None)
-        if count:
-            print(f"   {name}: {count}")
+        print(f"   time:                        {elapsed:.2f}s{speed}")
+    # The whole usage object, as the API sends it (every field, zeros included).
+    print("   raw usage:")
+    print(_indent(_show(usage.model_dump() if hasattr(usage, "model_dump") else usage,
+                        limit=None), "      "))
 
 
 def log_tool_request(name: str, tool_input) -> None:
