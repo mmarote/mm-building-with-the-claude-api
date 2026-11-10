@@ -1,7 +1,7 @@
 """
 Small logging helpers for the Building with the Claude API lessons.
 
-Ten functions, one per thing worth seeing:
+Twelve functions, one per thing worth seeing:
 
     log_banner(...)           a title between two lines, to separate parts of the log
     log_turn(...)             a banner for each round trip with Claude
@@ -13,6 +13,8 @@ Ten functions, one per thing worth seeing:
     log_answer_to_user(...)   Claude's final answer, the app's real output
     log_embedding_request(...)   texts we send to an embedding model (VoyageAI, RAG lessons)
     log_embedding_response(...)  the vectors it sends back, and the tokens billed
+    log_files_request(...)    a Files API call: upload, metadata, download or delete
+    log_files_response(...)   what the Files API sends back
 
 Usage:
     from helpers.log_helper import (
@@ -36,6 +38,10 @@ Usage:
     log_embedding_request(model="voyage-3-large", input_type="query", texts=texts)
     result = voyage_client.embed(texts, model="voyage-3-large", input_type="query")
     log_embedding_response(result)
+
+    log_files_request("upload", filename="data.csv", mime_type="text/csv", size_bytes=1234)
+    metadata = client.files.upload(...)
+    log_files_response("upload", metadata)
 
 Turn the debug logs off with `log_helper.ENABLED = False`.
 log_answer_to_user is not a debug log, so it always prints.
@@ -182,6 +188,10 @@ def log_model_response(response) -> None:
         return
     print("\n<- RESPONSE from Claude")
     print(f"   stop_reason: {response.stop_reason}")
+    # Code execution: the sandbox Claude ran in (its id, and when it expires).
+    container = getattr(response, "container", None)
+    if container:
+        print(f"   container:   {_show(container, indent=None, limit=None)}")
     for block in response.content:
         if block.type == "text":
             print(f"   text:        {_show(block.text, limit=None)}")
@@ -254,6 +264,39 @@ def log_tool_response(name: str, result) -> None:
         return
     print(f"<- TOOL RESULT: {name}")
     print(f"   output: {_show(result, indent=None)}")
+
+
+# The HTTP call behind each Files API method of the SDK.
+_FILES_ENDPOINTS = {
+    "upload": "POST /v1/files",
+    "retrieve_metadata": "GET /v1/files/{file_id}",
+    "download": "GET /v1/files/{file_id}/content",
+    "delete": "DELETE /v1/files/{file_id}",
+}
+
+
+def log_files_request(operation: str, **params) -> None:
+    """Log a Files API call right before we make it: the SDK method, its HTTP call and parameters."""
+    if not ENABLED:
+        return
+    endpoint = _FILES_ENDPOINTS.get(operation, "").replace("{file_id}", str(params.get("file_id", "{file_id}")))
+    print(f"\n-> FILES API: client.files.{operation}()   {endpoint}")
+    for name, value in params.items():
+        print(f"   {name + ':':12} {_show(value, indent=None)}")
+
+
+def log_files_response(operation: str, result) -> None:
+    """Log what the Files API returned: the metadata as JSON, or, for a download, the file's size and type."""
+    if not ENABLED:
+        return
+    print(f"<- FILES API: {operation}")
+    if hasattr(result, "write_to_file"):
+        # A download: the body is the file itself, so we show the HTTP status, type and size, not the bytes.
+        print(f"   status:       {result.status_code}")
+        print(f"   content-type: {result.headers.get('content-type', '?')}")
+        print(f"   file content: {len(result.read())} bytes")
+        return
+    print(_indent(_show(result, limit=None), "   "))
 
 
 def log_embedding_request(*, model, input_type, texts) -> None:
