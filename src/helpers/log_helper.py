@@ -6,7 +6,7 @@ Ten functions, one per thing worth seeing:
     log_banner(...)           a title between two lines, to separate parts of the log
     log_turn(...)             a banner for each round trip with Claude
     log_model_request(...)    what we send to Claude
-    log_model_response(...)   what Claude sends back (text and tool requests)
+    log_model_response(...)   what Claude sends back (text, citations and tool requests)
     log_model_usage(...)      tokens used by a call, and how long it took
     log_tool_request(...)     a tool call we are about to run
     log_tool_response(...)    what the tool returned
@@ -171,7 +171,10 @@ def log_model_request(
 
 
 def log_model_response(response) -> None:
-    """Log Claude's response: stop reason, text and tool requests (see log_model_usage for tokens)."""
+    """Log Claude's response: stop reason, text, citations and tool requests (see log_model_usage for tokens).
+
+    Citations are shown raw, as the API sends them: a list on the text block they support.
+    """
     if not ENABLED:
         return
     print("\n<- RESPONSE from Claude")
@@ -179,6 +182,10 @@ def log_model_response(response) -> None:
     for block in response.content:
         if block.type == "text":
             print(f"   text:        {_show(block.text)}")
+            # With citations on (documents, web search), a text block can carry a list of them.
+            for citation in getattr(block, "citations", None) or []:
+                print("      citation:")
+                print(_indent(_show(citation), "         "))
         elif block.type in ("tool_use", "server_tool_use", "mcp_tool_use"):
             # Claude doesn't run the tool. It returns the tool name and the input as separate fields.
             # (server_tool_use = a built-in tool that Anthropic runs for us, e.g. web search.
