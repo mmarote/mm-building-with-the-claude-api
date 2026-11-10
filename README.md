@@ -58,6 +58,13 @@ Activate the virtual environment, then run scripts from the project root. Script
 
 Then run any script with `python src/<folder>/<script>.py`. Each API call is billed to your account.
 
+The MCP lessons (section 07) each start their own MCP server: the script runs itself a second time with `--server`, and the two talk over stdin/stdout. Nothing else to start. To try a server in the browser with the MCP inspector (lesson 51), install the CLI extra and [Node.js](https://nodejs.org), then point it at a lesson:
+
+```bash
+pip install "mcp[cli]"
+PYTHONPATH=src mcp dev src/07-model-context-protocol/lesson55-defining-prompts.py
+```
+
 ## Runner UI (optional)
 
 A web app to run the lessons by clicking. Install once, then start it:
@@ -75,4 +82,4 @@ python run_ui.py
 
 ## Dependencies
 
-Pinned in [requirements.txt](requirements.txt). The main ones are `anthropic` (the SDK), `python-dotenv` and `voyageai` (embeddings for the RAG lessons). The optional runner UI has its own [runner-ui/requirements.txt](runner-ui/requirements.txt).
+Pinned in [requirements.txt](requirements.txt). The main ones are `anthropic` (the SDK), `python-dotenv`, `voyageai` (embeddings for the RAG lessons) and `mcp` (the MCP Python SDK, version 2, for section 07). The optional runner UI has its own [runner-ui/requirements.txt](runner-ui/requirements.txt).
