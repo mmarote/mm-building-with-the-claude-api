@@ -100,6 +100,20 @@ def _to_jsonable(obj):
     return str(obj)
 
 
+def _hide_base64(value):
+    """A copy of messages where base64 file data (images, PDFs) is replaced by a short note.
+
+    Otherwise one image fills the whole log with unreadable characters.
+    """
+    if isinstance(value, list):
+        return [_hide_base64(item) for item in value]
+    if isinstance(value, dict):
+        if value.get("type") == "base64" and isinstance(value.get("data"), str):
+            return {**value, "data": f"<base64 data, {len(value['data'])} characters>"}
+        return {key: _hide_base64(item) for key, item in value.items()}
+    return value
+
+
 def _indent(text: str, prefix: str = "    ") -> str:
     return "\n".join(prefix + line for line in text.splitlines())
 
@@ -153,7 +167,7 @@ def log_model_request(
         print("   tools:")
         print(_indent(_show(tools)))
     print("   messages:")
-    print(_indent(_show(messages or [])))
+    print(_indent(_show(_hide_base64(messages or []))))
 
 
 def log_model_response(response) -> None:
