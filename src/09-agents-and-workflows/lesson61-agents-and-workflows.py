@@ -1,4 +1,4 @@
-"""Building with the Claude API: Lesson 61 - Agents and workflows
+"""Building with the Claude API: Lesson 61 - Agents and workflows: the evaluator-optimizer pattern
 
 The course explains workflows with a diagram and no code; this script is our own
 illustration of its evaluator-optimizer example: a producer draws an ASCII rocket, and a
