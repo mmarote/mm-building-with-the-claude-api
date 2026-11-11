@@ -1,13 +1,139 @@
 """Building with the Claude API: Lesson 62 - Parallelization workflows
 
-Placeholder: the example for this lesson is not written yet.
+Instead of one long prompt that weighs every material at once, we send one focused request
+per material at the same time, then one request that compares the results and picks one.
 
-Course lesson: https://academy.claude.com/courses/building-with-the-claude-api/parallelization-workflows
+The workflow:
+
+                        ┌─► metal       ─┐
+                        ├─► polymer     ─┤
+    part description ───┼─► ceramic     ─┼──► AGGREGATOR (Claude) ──► recommendation
+     (same input to     ├─► composite   ─┤     compares the six analyses
+      every request)    ├─► elastomer   ─┤
+                        └─► wood        ─┘
+                     six requests at once, each with
+                     the criteria of ONE material
+
+Why split it:
+- Each request has one job, so Claude can focus on one material's criteria.
+- Each prompt can be tested and improved on its own; a new material is one more request.
+- The requests are independent, so they can run at the same time: the wait is about as long
+  as the slowest request, not the sum of all six.
+
+How they run at the same time: a thread pool (concurrent.futures). Each thread sends one
+request and waits for its answer. To keep the log readable, the requests are logged before
+they start and the responses after all of them are back, in a fixed order.
+
+The course vs. this script:
+- The course's app sends an image of the part with each request, and shows the flow only
+  as a diagram, with no criteria and no code. We describe the part in text, and wrote the
+  criteria for each material ourselves.
+
+https://academy.claude.com/courses/building-with-the-claude-api/parallelization-workflows
+
+The log_* calls come from helpers/log_helper.py and only print what is happening;
+they are not part of the lesson.
 """
+
+import re
+from concurrent.futures import ThreadPoolExecutor
+from anthropic.types import Message
+import helpers.chat_helper as chat_helper
+from helpers.chat_helper import add_user_message, send, text_from_message
+from helpers.models import CHEAPEST
+from helpers.log_helper import log_banner, log_model_request, log_model_response, Stopwatch
+
+
+model = CHEAPEST
+# Thinking counts toward max_tokens; you only pay for the tokens Claude actually uses.
+max_tokens = 16000
+
+part = """A wall bracket that holds a 2 kg outdoor security camera on a brick wall. L-shaped,
+about 12 cm per side, with two screw holes. Outdoors all year: rain, direct sun, and
+temperatures from -20 to 45 °C. Made in batches of about 5,000 per year."""
+
+# One set of criteria per material: each parallel request gets only its own.
+criteria = {
+    "metal": "strength and stiffness under load, corrosion in rain (and how to prevent it), "
+             "cost of machining or stamping",
+    "polymer": "creep under a constant load, UV degradation in sun, brittleness at -20 °C, "
+               "cost of injection molding",
+    "ceramic": "brittleness and impact resistance, how it handles screw clamping forces, cost of forming",
+    "composite": "stiffness-to-weight, moisture absorption, UV resistance of the resin, "
+                 "cost at 5,000 parts a year",
+    "elastomer": "whether it can hold a rigid shape under load at all, and where a flexible part would help",
+    "wood": "rot and swelling outdoors, strength across the grain at the screw holes, maintenance",
+}
+
+
+def analysis_prompt(material: str) -> str:
+    return f"""Evaluate how suitable {material} is for this part.
+
+<part>
+{part}
+</part>
+
+Consider only these criteria for {material}: {criteria[material]}.
+
+Answer in at most five short bullet points, then a last line exactly like this:
+Suitability: N/10"""
+
+
+def analyze(material: str) -> tuple[str, Message, float]:
+    """One parallel request: the analysis of one material. Returns (material, response, seconds)"""
+    messages = [{"role": "user", "content": analysis_prompt(material)}]
+    with Stopwatch() as sw:
+        response = chat_helper.client.messages.create(model=model, max_tokens=max_tokens, messages=messages)
+    return material, response, sw.seconds
+
+
+def suitability(text: str) -> str:
+    match = re.search(r"Suitability:\s*(\d+)\s*/\s*10", text)
+    return f"{match.group(1)}/10" if match else "?"
 
 
 def main():
-    print("Placeholder: this lesson's example is not written yet.")
+    log_banner("1. SIX REQUESTS AT ONCE: ONE PER MATERIAL")
+    for material in criteria:
+        log_model_request(model=model, max_tokens=max_tokens,
+                          messages=[{"role": "user", "content": analysis_prompt(material)}])
+
+    # All six run at the same time; map() returns the results in the order of criteria.
+    with Stopwatch() as wall:
+        with ThreadPoolExecutor(max_workers=len(criteria)) as pool:         # <- new
+            results = list(pool.map(analyze, criteria))                      # <- new
+
+    log_banner("2. THE SIX ANSWERS (logged after all of them are back)")
+    for material, response, seconds in results:
+        print(f"\n--- {material} ({seconds:.1f}s) ---")
+        log_model_response(response)
+
+    log_banner("3. THE AGGREGATOR: COMPARE THE ANALYSES AND RECOMMEND ONE")
+    analyses = "\n".join(
+        f'<analysis material="{material}">\n{text_from_message(response)}\n</analysis>'
+        for material, response, _ in results
+    )
+    messages = []
+    add_user_message(messages, f"""Several experts each analyzed one material for this part.
+
+<part>
+{part}
+</part>
+
+{analyses}
+
+Compare the analyses and recommend the best material for this part. Name the runner-up and
+say in two or three sentences what decided it.""")                                 # <- new
+    recommendation = text_from_message(send(messages, model=model, max_tokens=max_tokens))
+
+    print("\n=== THE SIX ANALYSES ===")
+    for material, response, seconds in results:
+        print(f"  {material:10} {suitability(text_from_message(response)):>5}   ({seconds:.1f}s)")
+    total = sum(seconds for _, _, seconds in results)
+    print(f"\n  One after another they would take about {total:.1f}s; "
+          f"in parallel they took {wall.seconds:.1f}s.")
+
+    print(f"\n=== ANSWER TO USER ===\n{recommendation}")
 
 
 if __name__ == "__main__":
