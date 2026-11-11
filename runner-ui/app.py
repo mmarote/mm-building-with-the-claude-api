@@ -79,6 +79,8 @@ GAP_LESSONS = [
     ("08", "58", "Claude Code setup", "claude-code-setup"),
     ("08", "59", "Claude Code in action", "claude-code-in-action"),
     ("08", "60", "Enhancements with MCP servers", "enhancements-with-mcp-servers"),
+    ("09", "66", "Environment inspection", "environment-inspection"),
+    ("09", "67", "Workflows vs agents", "workflows-vs-agents"),
 ]
 GAP_NOTE = "These lessons are explained on the course page and have no practical example in this project."
 
