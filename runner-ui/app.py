@@ -39,6 +39,75 @@ WARNINGS = {
                  "container time. Stop ends it early; the uploaded file is still deleted.",
 }
 
+# Labels shown in a lesson's header: its pattern (exactly one, a filled label), then the
+# features it uses (any number, outlined labels colored by group).
+PATTERNS = {   # name: (color, what it means, shown on hover)
+    "Building block": ("#6b7280", "A piece other lessons use; no Claude call"),
+    "Single LLM call": ("#3b82f6", "One request, one answer"),
+    "Conversation": ("#0891b2", "Several turns; the history is sent again each time"),
+    "Augmented LLM": ("#059669", "One request with tools or retrieved context, in a fixed round trip"),
+    "Workflow": ("#d97706", "Our code fixes the steps: a series of Claude calls"),
+    "Evaluation harness": ("#7c3aed", "Runs prompts over a test dataset and grades the answers"),
+    "Agent": ("#c66240", "Claude decides the steps: which tools to call, and when it is done"),
+}
+FEATURE_GROUPS = {   # group: (color, features)
+    "Models": ("#ec4899", ["No LLM", "Embeddings", "Extended thinking", "Vision", "PDF"]),
+    "Tools": ("#22c55e", ["Tools", "Web search", "Code execution", "Text editor", "MCP"]),
+    "Output": ("#38bdf8", ["Streaming", "Structured output", "Stop sequences", "Citations"]),
+    "Data": ("#eab308", ["Vector DB", "Lexical search", "Chunking", "Files API", "Prompt caching"]),
+}
+# Lesson ("8") or example ("8a") -> (pattern, [features]). An example's entry wins over its lesson's.
+LESSON_TAGS = {
+    "3": ("Single LLM call", []),
+    "4": ("Conversation", []),
+    "5": ("Single LLM call", []),
+    "6": ("Single LLM call", []),
+    "7": ("Single LLM call", ["Streaming"]),
+    "8a": ("Single LLM call", ["Stop sequences"]),
+    "8b": ("Single LLM call", ["Structured output"]),
+    "11": ("Evaluation harness", ["Structured output"]),
+    "12": ("Evaluation harness", []),
+    "13": ("Evaluation harness", ["Structured output"]),
+    "14": ("Evaluation harness", ["Structured output"]),
+    "15": ("Evaluation harness", []),
+    "16": ("Evaluation harness", []),
+    "17": ("Evaluation harness", []),
+    "18": ("Evaluation harness", []),
+    "19": ("Evaluation harness", []),
+    "22": ("Building block", ["No LLM", "Tools"]),
+    "23": ("Building block", ["No LLM", "Tools"]),
+    "24": ("Augmented LLM", ["Tools"]),
+    "25": ("Augmented LLM", ["Tools"]),
+    "26": ("Agent", ["Tools"]),
+    "27": ("Agent", ["Tools"]),
+    "28": ("Agent", ["Tools"]),
+    "29": ("Agent", ["Tools", "Streaming"]),
+    "30": ("Agent", ["Text editor"]),
+    "31": ("Agent", ["Web search", "Citations"]),
+    "33": ("Building block", ["No LLM", "Chunking"]),
+    "34": ("Building block", ["No LLM", "Embeddings"]),
+    "36": ("Building block", ["No LLM", "Chunking", "Embeddings", "Vector DB"]),
+    "37": ("Building block", ["No LLM", "Lexical search"]),
+    "38": ("Building block", ["No LLM", "Embeddings", "Vector DB", "Lexical search"]),
+    "39": ("Single LLM call", ["Extended thinking"]),
+    "40": ("Single LLM call", ["Vision"]),
+    "41": ("Single LLM call", ["PDF"]),
+    "42": ("Single LLM call", ["PDF", "Citations"]),
+    "45": ("Augmented LLM", ["Tools", "Prompt caching"]),
+    "46": ("Agent", ["Code execution", "Files API"]),
+    "50": ("Building block", ["No LLM", "MCP", "Tools"]),
+    "52": ("Agent", ["MCP", "Tools"]),
+    "53": ("Building block", ["No LLM", "MCP"]),
+    "54": ("Augmented LLM", ["MCP"]),
+    "55": ("Building block", ["No LLM", "MCP"]),
+    "56": ("Agent", ["MCP", "Tools"]),
+    "61": ("Workflow", ["Structured output"]),
+    "62": ("Workflow", []),
+    "63": ("Workflow", []),
+    "64": ("Workflow", []),
+    "65": ("Agent", ["Tools"]),
+}
+
 COURSE_URL = "https://academy.claude.com/courses/building-with-the-claude-api"
 # The Claude logo (transparent PNG) for the "Open the course" box, embedded as a data URI.
 LOGO_BASE64 = base64.b64encode((ROOT / "runner-ui" / "assets" / "claude-logo.png").read_bytes()).decode()
@@ -150,6 +219,30 @@ DEPRECATED_BADGE = " :red[**DEPRECATED**]"
 def badges(lesson_id):
     """Red badges for a lesson ("6") or one example ("8a"): BETA and/or DEPRECATED, with a leading space."""
     return (BETA_BADGE if lesson_id in BETA_LESSONS else "") + (DEPRECATED_BADGE if lesson_id in DEPRECATED_LESSONS else "")
+
+
+FEATURE_COLORS = {feature: (color, group) for group, (color, features) in FEATURE_GROUPS.items()
+                  for feature in features}
+
+
+def tags_html(lesson_id, number):
+    """The lesson's labels as HTML: the pattern filled, then its features outlined ("" if none)."""
+    entry = LESSON_TAGS.get(lesson_id) or LESSON_TAGS.get(number)
+    if not entry:
+        return ""
+    pattern, features = entry
+    style = ("display: inline-block; padding: 0.1rem 0.55rem; margin-left: 0.3rem; line-height: 1.4; "
+             "border-radius: 999px; font-size: 0.8rem; white-space: nowrap; border: 1px solid {color};")
+    color, meaning = PATTERNS.get(pattern, ("#6b7280", ""))
+    labels = [f"<span title='Pattern: {meaning}' style='{style.format(color=color)} "
+              f"background: {color}; color: #fff; font-weight: 600;'>{pattern}</span>"]
+    for feature in features:
+        color, group = FEATURE_COLORS.get(feature, ("#6b7280", "Other"))
+        labels.append(f"<span title='{group}' style='{style.format(color=color)} "
+                      f"color: {color};'>{feature}</span>")
+    # A flex box as tall as a button (2.5rem), so the labels line up with the header buttons.
+    return (f"<div style='display: flex; justify-content: flex-end; align-items: center; "
+            f"flex-wrap: wrap; row-gap: 0.2rem; min-height: 2.5rem;'>{''.join(labels)}</div>")
 
 
 def lesson_parts(path):
@@ -556,29 +649,36 @@ if st.session_state.selected is None:
 script = Path(st.session_state.selected)
 title, intro = description(script)
 
-# Breadcrumb on the left, "Open in" (course link) in the middle, previous / next lesson on the right.
-# The weights make the middle column sit at the centre of the row.
+# Breadcrumb on the left; on the right: the lesson's labels, "Open in" (course link), and
+# small previous / next arrows.
 lessons = [path for scripts in groups.values() for path in scripts]
 position = lessons.index(script)
 section_title = SECTIONS.get(script.parent.name[:2], ("", script.parent.name, ""))[1]
-crumb, open_col, previous_col, next_col = st.columns([2.5, 2, 1.25, 1.25], vertical_alignment="center")
+crumb, tags_col, open_col, previous_col, next_col = st.columns(
+    [2.4, 3.6, 0.95, 0.3, 0.3], vertical_alignment="center", gap="small")
 lesson_number = lesson_parts(script)[0]
 examples = lesson_groups(groups[script.parent.name])[lesson_number]
 crumb.caption(f"{section_title}  ›  {group_label(lesson_number, examples, count=False)}")
+if labels := tags_html("".join(lesson_parts(script)[:2]), lesson_number):
+    tags_col.html(labels)   # st.html, not markdown: markdown's negative margin would shift it down
 if course_url := course_lesson_url(script):
-    # Styled like a button, so it sits level with Previous / Next. The logo is a small inline image.
-    open_col.markdown(
-        f"<div style='text-align: center;'>"
+    # Styled like a button, in a flex box as tall as one (2.5rem), so it sits level with the
+    # arrows. The logo is a small inline image.
+    open_col.html(
+        f"<div style='display: flex; justify-content: flex-end; align-items: center; height: 2.5rem;'>"
         f"<a href='{course_url}' target='_blank' style='display: inline-block; padding: 0.4rem 1rem; "
+        f"line-height: 1.4; "
         f"border: 1px solid rgba(250, 250, 250, 0.2); border-radius: 0.5rem; text-decoration: none; color: inherit;'>"
         f"Open in <img src='data:image/png;base64,{LOGO_BASE64}' alt='Claude' "
-        f"style='height: 1.1em; width: auto; vertical-align: -0.15em;' /></a></div>",
-        unsafe_allow_html=True,
+        f"style='height: 1.1em; width: auto; vertical-align: -0.15em;' /></a></div>"
     )
-previous_col.button("← Previous", on_click=open_lesson, args=(lessons[max(position - 1, 0)],),
-                    disabled=position == 0, use_container_width=True)
-next_col.button("Next →", on_click=open_lesson, args=(lessons[min(position + 1, len(lessons) - 1)],),
-                disabled=position == len(lessons) - 1, use_container_width=True)
+# Arrows only; hovering one shows which lesson it opens.
+previous_lesson = lessons[max(position - 1, 0)]
+next_lesson = lessons[min(position + 1, len(lessons) - 1)]
+previous_col.button("←", key="previous", on_click=open_lesson, args=(previous_lesson,),
+                    disabled=position == 0, help=f"Previous: {lesson_label(previous_lesson)}")
+next_col.button("→", key="next", on_click=open_lesson, args=(next_lesson,),
+                disabled=position == len(lessons) - 1, help=f"Next: {lesson_label(next_lesson)}")
 
 if len(examples) > 1:
     # One lesson, several examples: switch between them here.

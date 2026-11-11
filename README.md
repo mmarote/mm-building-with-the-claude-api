@@ -79,6 +79,7 @@ python run_ui.py
 - While a lesson runs, the Run button becomes **Stop**. Stop (or any other click on the page) stops the lesson like Ctrl+C, so its cleanup still runs, and keeps the output printed so far.
 - Images a lesson saves and mentions in its output (e.g. the plot of lesson 46) are shown below the text.
 - Some lessons show a warning at the top before you run them, e.g. lesson 46 takes several minutes.
+- Each lesson's header shows color-coded labels: its pattern, filled (Building block, Single LLM call, Conversation, Augmented LLM, Workflow, Evaluation harness or Agent), then the features it uses, outlined and colored by group (models, tools, output, data). Hover a label to see what it means.
 
 ## Dependencies
 
