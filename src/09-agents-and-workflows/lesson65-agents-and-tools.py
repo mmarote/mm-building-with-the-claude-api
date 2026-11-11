@@ -25,9 +25,22 @@ Good agent tools are small and combinable (the course's point about Claude Code:
 write, edit, rather than "refactor code"). These three can be combined into requests nobody
 planned for, such as "remind me 3 months after my last dentist visit on March 3".
 
+What you see: the steps Claude takes for each goal, not the API log.
+
+    step 1  Claude calls get_current_datetime(date_format="%Y-%m-%d")
+            -> "2026-11-11"
+    step 2  Claude calls add_duration_to_datetime(datetime_str="2026-11-11", duration=11, ...)
+            -> "Sunday, November 22, 2026 12:00:00 AM"
+    step 3  Claude answers: In 11 days it will be a Sunday, November 22.
+
+The arguments show the chaining: the result of step 1 goes into step 2. Lessons 27-28
+showed the raw tool_use and tool_result blocks; to see them again here, set
+show_api_log = True.
+
 The course vs. this script:
 - The course describes the requests and shows no code. The tools are lesson 28's code;
   the loop runs each request as its own conversation.
+- The step trace in place of the full log is ours, so the plan Claude makes stands out.
 
 https://academy.claude.com/courses/building-with-the-claude-api/agents-and-tools
 
@@ -39,9 +52,10 @@ import calendar
 import json
 from datetime import datetime, timedelta
 from anthropic.types import Message, ToolParam
+import helpers.log_helper as log_helper
 from helpers.chat_helper import add_user_message, add_assistant_message, send, text_from_message
 from helpers.models import CHEAPEST
-from helpers.log_helper import log_banner, log_turn, log_tool_request, log_tool_response
+from helpers.log_helper import log_turn, log_tool_request, log_tool_response
 
 
 # The tools, from lesson 28.
@@ -149,6 +163,9 @@ tool_functions = {
 model = CHEAPEST
 # Thinking counts toward max_tokens; you only pay for the tokens Claude actually uses.
 max_tokens = 16000
+# This lesson is about the steps Claude picks, so it shows a step trace instead of the full
+# API log. True: also print every request and response, as in the other lessons.
+show_api_log = False
 
 # Four goals for the same agent: the code below does not change between them.
 requests = [
@@ -159,11 +176,24 @@ requests = [
 ]
 
 
+def show_step(text: str) -> None:
+    """One numbered line of the step trace"""
+    show_step.number += 1
+    print(f"  step {show_step.number:<2} {text}")
+
+
+def call_text(name: str, tool_input: dict) -> str:
+    """A tool call written like Python, e.g. get_current_datetime(date_format="%H:%M")"""
+    args = ", ".join(f"{key}={json.dumps(value)}" for key, value in tool_input.items())
+    return f"{name}({args})"
+
+
 def run_tools(message: Message, tools_used: list[str]) -> list[dict]:
     """Runs every tool Claude asked for; returns one tool_result block per request"""
     results = []
     for block in [block for block in message.content if block.type == "tool_use"]:
         log_tool_request(block.name, block.input)
+        show_step(f"Claude calls {call_text(block.name, block.input)}")    # <- new
         tools_used.append(block.name)
         try:
             output, is_error = json.dumps(tool_functions[block.name](**block.input)), False
@@ -171,6 +201,7 @@ def run_tools(message: Message, tools_used: list[str]) -> list[dict]:
             # Claude still gets an answer, and can retry with other arguments.
             output, is_error = f"Error: {e}", True
         log_tool_response(block.name, output)
+        print(f"          -> {output}")
         results.append({"type": "tool_result", "tool_use_id": block.id,
                         "content": output, "is_error": is_error})
     return results
@@ -183,6 +214,7 @@ def run_agent(goal: str) -> tuple[str, list[str], int]:
     add_user_message(messages, goal)
     tools_used = []
     turn = 0
+    show_step.number = 0
     while True:
         turn += 1
         log_turn(turn)
@@ -190,17 +222,30 @@ def run_agent(goal: str) -> tuple[str, list[str], int]:
         add_assistant_message(messages, response)
         if response.stop_reason != "tool_use":                               # <- new
             # Done, or Claude needs something only the user can give (e.g. a purchase date).
-            return text_from_message(response), tools_used, turn
+            answer = text_from_message(response)
+            show_step(f"Claude answers: {first_line(answer)}")
+            return answer, tools_used, turn
+        # Text next to a tool call is Claude saying what it is about to do.
+        for block in response.content:
+            if block.type == "text" and block.text.strip():
+                print(f"          Claude: {first_line(block.text)}")
         add_user_message(messages, run_tools(response, tools_used))
 
 
+def first_line(text: str, limit: int = 80) -> str:
+    """The first line of a text, cut at limit characters (the full answers come at the end)"""
+    line = text.strip().splitlines()[0] if text.strip() else ""
+    return line if len(line) <= limit else line[:limit] + "..."
+
+
 def main():
+    log_helper.ENABLED = show_api_log                                       # <- new
     results = []
     for goal in requests:
-        log_banner(f"GOAL: {goal}")
+        print(f"\n{'=' * 60}\nGOAL: {goal}\n{'=' * 60}")
         results.append((goal, *run_agent(goal)))                              # <- new
 
-    print("\n=== WHAT THE AGENT DID ===")
+    print("\n\n\n=== WHAT THE AGENT DID ===")
     for goal, _, tools_used, turns in results:
         steps = " -> ".join(tools_used) if tools_used else "no tools"
         print(f"  {goal}\n      {turns} turn(s): {steps}")
