@@ -102,8 +102,8 @@ def main():
     for topic, path, _ in results:
         print(f"  {topic:18} -> {path}")
 
-    print("\n=== ANSWER TO USER ===")
     for topic, path, script in results:
+        print("\n=== ANSWER TO USER ===")
         print(f"\n--- {topic} ({path}) ---\n{script}")
 
 
