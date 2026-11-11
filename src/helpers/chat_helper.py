@@ -29,6 +29,10 @@ Not included: temperature. Models released after Claude Opus 4.6 reject it (see 
 Assistant prefill is still possible through add_assistant_message, but it is deprecated on current
 models (see lessons 8 and 11).
 
+For several requests at once (lesson 62), use `async_client`, the async version of `client`:
+
+    response = await chat_helper.async_client.messages.create(...)
+
 The log_* calls come from helpers/log_helper.py. Turn them off with `log_helper.ENABLED = False`.
 """
 
@@ -39,6 +43,7 @@ from helpers.log_helper import log_model_request, log_model_response
 
 
 client = anthropic.Anthropic()
+async_client = anthropic.AsyncAnthropic()  # for asyncio: await async_client.messages.create(...)
 
 
 def add_user_message(messages, message):
